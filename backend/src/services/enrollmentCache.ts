@@ -214,7 +214,7 @@ export class EnrollmentCacheService {
         { $match: { institucion_slug } },
         {
           $group: {
-            _id: "$enrollment_status",
+            _id: "$estado",
             count: { $sum: 1 },
           },
         },
@@ -230,13 +230,14 @@ export class EnrollmentCacheService {
       stats.forEach((stat) => {
         result.total_enrollments += stat.count;
         switch (stat._id) {
-          case "PENDING":
-            result.pending_enrollments = stat.count;
+          case "INTERES":
+          case "ENTREVISTA":
+            result.pending_enrollments += stat.count;
             break;
-          case "CONFIRMED":
+          case "ACEPTADO":
             result.confirmed_enrollments = stat.count;
             break;
-          case "REJECTED":
+          case "RECHAZADO":
             result.rejected_enrollments = stat.count;
             break;
         }

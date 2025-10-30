@@ -185,7 +185,6 @@ export const submitEnrollment = async (
     // Create estudiante in MongoDB
     const estudiante = new EstudianteModel({
       ...enrollmentData,
-      enrollment_status: "PENDING",
     });
 
     const savedEstudiante = await estudiante.save();

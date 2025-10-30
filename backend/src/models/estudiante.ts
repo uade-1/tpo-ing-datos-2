@@ -44,12 +44,6 @@ const EstudianteSchema = new Schema<Estudiante & Document>(
     comite: { type: EstudianteComiteSchema, required: false },
     fecha_resolucion: { type: Date, required: false },
     institucion_slug: { type: String, required: true },
-    enrollment_status: {
-      type: String,
-      required: true,
-      enum: ["PENDING", "CONFIRMED", "REJECTED"],
-      default: "PENDING",
-    },
   },
   {
     timestamps: false,

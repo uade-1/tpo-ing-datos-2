@@ -59,5 +59,3 @@ export interface DNIReservationResult {
   message: string;
   reservation_id?: string;
 }
-
-export type EnrollmentStatus = "PENDING" | "CONFIRMED" | "REJECTED";

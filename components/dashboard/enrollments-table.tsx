@@ -402,11 +402,6 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
                                     )}
                                   </Button>
                                 </div>
-                                {estudiante.fecha_entrevista && (
-                                  <p className="text-xs text-gray-500 mt-1">
-                                    Actual: {formatDate(estudiante.fecha_entrevista)}
-                                  </p>
-                                )}
                               </div>
                               <div>
                                 <p className="font-semibold text-gray-700 mb-1">Estado</p>

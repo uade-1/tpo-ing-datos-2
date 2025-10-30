@@ -10,8 +10,6 @@ export interface EstudianteComite {
   comentarios: string;
 }
 
-export type EnrollmentStatus = "PENDING" | "CONFIRMED" | "REJECTED";
-
 export interface Estudiante {
   _id: string;
   id_postulante: string;
@@ -29,7 +27,6 @@ export interface Estudiante {
   comite: EstudianteComite;
   fecha_resolucion?: Date;
   institucion_slug: string;
-  enrollment_status: EnrollmentStatus;
 }
 
 export interface CreateEstudianteRequest {
@@ -48,7 +45,6 @@ export interface CreateEstudianteRequest {
   comite?: EstudianteComite;
   fecha_resolucion?: Date;
   institucion_slug: string;
-  enrollment_status?: EnrollmentStatus;
 }
 
 export interface UpdateEstudianteRequest {
