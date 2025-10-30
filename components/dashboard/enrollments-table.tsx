@@ -271,199 +271,201 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
             No enrollments found.
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12"></TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Carrera</TableHead>
-                <TableHead>Estado</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {estudiantes.map((estudiante) => {
-                const isExpanded = expandedRows.has(estudiante._id);
-                return (
-                  <React.Fragment key={estudiante._id}>
-                    <TableRow>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleRow(estudiante._id)}
-                          className="h-8 w-8 p-0"
-                        >
-                          {isExpanded ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {estudiante.nombre} {estudiante.apellido}
-                      </TableCell>
-                      <TableCell>{estudiante.carrera_interes}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            estadoColors[estudiante.estado] || "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {estudiante.estado}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                    {isExpanded && (
+          <div className="max-h-[600px] overflow-y-auto border rounded-md">
+            <Table>
+              <TableHeader className="sticky top-0 bg-white z-10">
+                <TableRow>
+                  <TableHead className="w-12"></TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Carrera</TableHead>
+                  <TableHead>Estado</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {estudiantes.map((estudiante) => {
+                  const isExpanded = expandedRows.has(estudiante._id);
+                  return (
+                    <React.Fragment key={estudiante._id}>
                       <TableRow>
-                        <TableCell colSpan={4} className="bg-gray-50">
-                          <div className="px-4 py-4">
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-4">
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">ID Postulante</p>
-                                <p className="text-gray-600">{estudiante.id_postulante}</p>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">DNI</p>
-                                <p className="text-gray-600">{estudiante.dni}</p>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Email</p>
-                                <p className="text-gray-600">{estudiante.mail}</p>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Nombre</p>
-                                <p className="text-gray-600">{estudiante.nombre}</p>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Apellido</p>
-                                <p className="text-gray-600">{estudiante.apellido}</p>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Departamento</p>
-                                <p className="text-gray-600">{estudiante.departamento_interes}</p>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Carrera</p>
-                                <p className="text-gray-600">{estudiante.carrera_interes}</p>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Fecha de Interés</p>
-                                <p className="text-gray-600">{formatDate(estudiante.fecha_interes)}</p>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Fecha de Resolución</p>
-                                <p className="text-gray-600">{formatDate(estudiante.fecha_resolucion)}</p>
-                              </div>
-                              <div className="md:col-span-3">
-                                <p className="font-semibold text-gray-700 mb-2">Fecha de Entrevista</p>
-                                <div className="flex items-center gap-2">
-                                  <Input
-                                    type="date"
-                                    value={fechaEntrevistaValues[estudiante.id_postulante] || ""}
-                                    onChange={(e) => {
-                                      setFechaEntrevistaValues((prev) => ({
-                                        ...prev,
-                                        [estudiante.id_postulante]: e.target.value,
-                                      }));
-                                    }}
-                                    className="max-w-xs"
-                                    disabled={updatingIds.has(estudiante.id_postulante)}
-                                    min={MIN_DATE}
-                                  />
-                                  <Button
-                                    size="sm"
-                                    onClick={() => {
-                                      const fechaValue = fechaEntrevistaValues[estudiante.id_postulante];
-                                      if (fechaValue) {
-                                        handleSetFechaEntrevista(estudiante.id_postulante, fechaValue);
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleRow(estudiante._id)}
+                            className="h-8 w-8 p-0"
+                          >
+                            {isExpanded ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {estudiante.nombre} {estudiante.apellido}
+                        </TableCell>
+                        <TableCell>{estudiante.carrera_interes}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              estadoColors[estudiante.estado] || "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {estudiante.estado}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                      {isExpanded && (
+                        <TableRow>
+                          <TableCell colSpan={4} className="bg-gray-50">
+                            <div className="px-4 py-4">
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-4">
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">ID Postulante</p>
+                                  <p className="text-gray-600">{estudiante.id_postulante}</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">DNI</p>
+                                  <p className="text-gray-600">{estudiante.dni}</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Email</p>
+                                  <p className="text-gray-600">{estudiante.mail}</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Nombre</p>
+                                  <p className="text-gray-600">{estudiante.nombre}</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Apellido</p>
+                                  <p className="text-gray-600">{estudiante.apellido}</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Departamento</p>
+                                  <p className="text-gray-600">{estudiante.departamento_interes}</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Carrera</p>
+                                  <p className="text-gray-600">{estudiante.carrera_interes}</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Fecha de Interés</p>
+                                  <p className="text-gray-600">{formatDate(estudiante.fecha_interes)}</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Fecha de Resolución</p>
+                                  <p className="text-gray-600">{formatDate(estudiante.fecha_resolucion)}</p>
+                                </div>
+                                <div className="md:col-span-3">
+                                  <p className="font-semibold text-gray-700 mb-2">Fecha de Entrevista</p>
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      type="date"
+                                      value={fechaEntrevistaValues[estudiante.id_postulante] || ""}
+                                      onChange={(e) => {
+                                        setFechaEntrevistaValues((prev) => ({
+                                          ...prev,
+                                          [estudiante.id_postulante]: e.target.value,
+                                        }));
+                                      }}
+                                      className="max-w-xs"
+                                      disabled={updatingIds.has(estudiante.id_postulante)}
+                                      min={MIN_DATE}
+                                    />
+                                    <Button
+                                      size="sm"
+                                      onClick={() => {
+                                        const fechaValue = fechaEntrevistaValues[estudiante.id_postulante];
+                                        if (fechaValue) {
+                                          handleSetFechaEntrevista(estudiante.id_postulante, fechaValue);
+                                        }
+                                      }}
+                                      disabled={
+                                        updatingIds.has(estudiante.id_postulante) ||
+                                        !fechaEntrevistaValues[estudiante.id_postulante] ||
+                                        fechaEntrevistaValues[estudiante.id_postulante] ===
+                                          (estudiante.fecha_entrevista
+                                            ? new Date(estudiante.fecha_entrevista).toISOString().split('T')[0]
+                                            : "")
                                       }
-                                    }}
-                                    disabled={
-                                      updatingIds.has(estudiante.id_postulante) ||
-                                      !fechaEntrevistaValues[estudiante.id_postulante] ||
-                                      fechaEntrevistaValues[estudiante.id_postulante] ===
-                                        (estudiante.fecha_entrevista
-                                          ? new Date(estudiante.fecha_entrevista).toISOString().split('T')[0]
-                                          : "")
-                                    }
+                                      variant="outline"
+                                    >
+                                      {updatingIds.has(estudiante.id_postulante) ? (
+                                        <>
+                                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                          Guardando...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Calendar className="h-3 w-3 mr-1" />
+                                          Guardar
+                                        </>
+                                      )}
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-700 mb-1">Estado</p>
+                                  <span
+                                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                      estadoColors[estudiante.estado] || "bg-gray-100 text-gray-800"
+                                    }`}
+                                  >
+                                    {estudiante.estado}
+                                  </span>
+                                </div>
+                              </div>
+                              {estudiante.estado !== "ACEPTADO" && estudiante.estado !== "RECHAZADO" && (
+                                <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
+                                  <Button
                                     variant="outline"
+                                    size="sm"
+                                    onClick={() => handleReject(estudiante.id_postulante)}
+                                    disabled={updatingIds.has(estudiante.id_postulante)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                   >
                                     {updatingIds.has(estudiante.id_postulante) ? (
                                       <>
-                                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                        Guardando...
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Procesando...
                                       </>
                                     ) : (
                                       <>
-                                        <Calendar className="h-3 w-3 mr-1" />
-                                        Guardar
+                                        <XCircle className="h-4 w-4 mr-2" />
+                                        Rechazar
+                                      </>
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleAccept(estudiante.id_postulante)}
+                                    disabled={updatingIds.has(estudiante.id_postulante)}
+                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                  >
+                                    {updatingIds.has(estudiante.id_postulante) ? (
+                                      <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Procesando...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        Aceptar
                                       </>
                                     )}
                                   </Button>
                                 </div>
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Estado</p>
-                                <span
-                                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                    estadoColors[estudiante.estado] || "bg-gray-100 text-gray-800"
-                                  }`}
-                                >
-                                  {estudiante.estado}
-                                </span>
-                              </div>
+                              )}
                             </div>
-                            {estudiante.estado !== "ACEPTADO" && estudiante.estado !== "RECHAZADO" && (
-                              <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleReject(estudiante.id_postulante)}
-                                  disabled={updatingIds.has(estudiante.id_postulante)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  {updatingIds.has(estudiante.id_postulante) ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                      Procesando...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <XCircle className="h-4 w-4 mr-2" />
-                                      Rechazar
-                                    </>
-                                  )}
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleAccept(estudiante.id_postulante)}
-                                  disabled={updatingIds.has(estudiante.id_postulante)}
-                                  className="bg-green-600 hover:bg-green-700 text-white"
-                                >
-                                  {updatingIds.has(estudiante.id_postulante) ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                      Procesando...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Aceptar
-                                    </>
-                                  )}
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>
