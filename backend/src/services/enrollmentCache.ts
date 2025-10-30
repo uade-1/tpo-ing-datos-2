@@ -14,26 +14,28 @@ export class EnrollmentCacheService {
   }
 
   /**
-   * Check if DNI exists for a specific carrera_interes
+   * Check if DNI exists for a specific carrera_interes at a specific institution
    * Redis first (O(1)), then MongoDB fallback
    */
   async checkDNIExistsForCarrera(
     dni: string,
-    carrera_interes: string
+    carrera_interes: string,
+    institucion_slug: string
   ): Promise<boolean> {
     try {
-      // Check Redis first (fastest) - use compound key
-      const redisKey = `${DNI_PREFIX}${dni}:${carrera_interes}`;
+      // Check Redis first (fastest) - use compound key with institucion_slug
+      const redisKey = `${DNI_PREFIX}${dni}:${carrera_interes}:${institucion_slug}`;
       const existsInRedis = await this.redis.exists(redisKey);
 
       if (existsInRedis) {
         return true;
       }
 
-      // Fallback to MongoDB - check specific DNI + carrera combination
+      // Fallback to MongoDB - check specific DNI + carrera + institution combination
       const existsInMongoDB = await EstudianteModel.exists({
         dni,
         carrera_interes,
+        institucion_slug,
       });
 
       if (existsInMongoDB) {
@@ -48,7 +50,7 @@ export class EnrollmentCacheService {
       // If Redis fails, fallback to MongoDB
       try {
         return (
-          (await EstudianteModel.exists({ dni, carrera_interes })) !== null
+          (await EstudianteModel.exists({ dni, carrera_interes, institucion_slug })) !== null
         );
       } catch (mongoError) {
         console.error("MongoDB fallback failed:", mongoError);
@@ -58,29 +60,28 @@ export class EnrollmentCacheService {
   }
 
   /**
-   * Get all carreras a DNI is enrolled in
+   * Get all carreras a DNI is enrolled in (optionally filtered by institution)
    */
-  async getDNICarreras(dni: string): Promise<string[]> {
+  async getDNICarreras(dni: string, institucion_slug?: string): Promise<string[]> {
     try {
-      // Check Redis first
-      const redisKey = `${DNI_PREFIX}${dni}:*`;
-      const keys = await this.redis.keys(redisKey);
-
-      if (keys.length > 0) {
-        // Extract carrera names from Redis keys
-        return keys.map((key) => key.split(":")[2]);
+      // Build MongoDB query
+      const query: any = { dni };
+      if (institucion_slug) {
+        query.institucion_slug = institucion_slug;
       }
 
-      // Fallback to MongoDB
+      // Fallback to MongoDB (Redis keys pattern matching is inefficient, so we query MongoDB directly)
       const estudiantes = await EstudianteModel.find(
-        { dni },
-        { carrera_interes: 1 }
+        query,
+        { carrera_interes: 1, institucion_slug: 1 }
       );
-      const carreras = estudiantes.map((est) => est.carrera_interes);
+      
+      // Extract unique carreras
+      const carreras = [...new Set(estudiantes.map((est) => est.carrera_interes))];
 
-      // Cache each carrera in Redis
-      for (const carrera of carreras) {
-        const key = `${DNI_PREFIX}${dni}:${carrera}`;
+      // Cache each carrera in Redis with institution slug
+      for (const estudiante of estudiantes) {
+        const key = `${DNI_PREFIX}${dni}:${estudiante.carrera_interes}:${estudiante.institucion_slug}`;
         await this.redis.setex(key, 3600, "1");
       }
 
@@ -89,11 +90,12 @@ export class EnrollmentCacheService {
       console.error("Error getting DNI carreras:", error);
       // If Redis fails, fallback to MongoDB
       try {
-        const estudiantes = await EstudianteModel.find(
-          { dni },
-          { carrera_interes: 1 }
-        );
-        return estudiantes.map((est) => est.carrera_interes);
+        const query: any = { dni };
+        if (institucion_slug) {
+          query.institucion_slug = institucion_slug;
+        }
+        const estudiantes = await EstudianteModel.find(query, { carrera_interes: 1 });
+        return [...new Set(estudiantes.map((est) => est.carrera_interes))];
       } catch (mongoError) {
         console.error("MongoDB fallback failed:", mongoError);
         throw new Error("Database connection error") as ApiError;
@@ -102,16 +104,17 @@ export class EnrollmentCacheService {
   }
 
   /**
-   * Atomically reserve a DNI for a specific carrera using Redis SETNX
+   * Atomically reserve a DNI for a specific carrera at a specific institution using Redis SETNX
    * Returns true if reservation successful, false if already exists
    */
   async reserveDNIForCarrera(
     dni: string,
     carrera_interes: string,
+    institucion_slug: string,
     ttl: number = DEFAULT_TTL
   ): Promise<boolean> {
     try {
-      const reservationKey = `${RESERVATION_PREFIX}${dni}:${carrera_interes}`;
+      const reservationKey = `${RESERVATION_PREFIX}${dni}:${carrera_interes}:${institucion_slug}`;
 
       // Atomic operation: SET if Not eXists
       const result = await this.redis.set(
@@ -130,14 +133,15 @@ export class EnrollmentCacheService {
   }
 
   /**
-   * Release a DNI reservation for a specific carrera
+   * Release a DNI reservation for a specific carrera at a specific institution
    */
   async releaseDNIForCarrera(
     dni: string,
-    carrera_interes: string
+    carrera_interes: string,
+    institucion_slug: string
   ): Promise<void> {
     try {
-      const reservationKey = `${RESERVATION_PREFIX}${dni}:${carrera_interes}`;
+      const reservationKey = `${RESERVATION_PREFIX}${dni}:${carrera_interes}:${institucion_slug}`;
       await this.redis.del(reservationKey);
     } catch (error) {
       console.error("Error releasing DNI reservation for carrera:", error);
@@ -146,22 +150,23 @@ export class EnrollmentCacheService {
   }
 
   /**
-   * Confirm enrollment and cache the DNI for specific carrera permanently
+   * Confirm enrollment and cache the DNI for specific carrera at specific institution permanently
    */
   async confirmEnrollmentForCarrera(
     dni: string,
-    carrera_interes: string
+    carrera_interes: string,
+    institucion_slug: string
   ): Promise<void> {
     try {
-      const dniKey = `${DNI_PREFIX}${dni}:${carrera_interes}`;
-      const enrollmentKey = `${ENROLLMENT_PREFIX}${dni}:${carrera_interes}`;
+      const dniKey = `${DNI_PREFIX}${dni}:${carrera_interes}:${institucion_slug}`;
+      const enrollmentKey = `${ENROLLMENT_PREFIX}${dni}:${carrera_interes}:${institucion_slug}`;
 
       // Mark as enrolled in Redis (permanent)
       await this.redis.set(dniKey, "enrolled");
       await this.redis.set(enrollmentKey, "confirmed");
 
       // Remove any pending reservation
-      await this.releaseDNIForCarrera(dni, carrera_interes);
+      await this.releaseDNIForCarrera(dni, carrera_interes, institucion_slug);
     } catch (error) {
       console.error("Error confirming enrollment for carrera:", error);
       throw new Error("Failed to confirm enrollment for carrera") as ApiError;

@@ -1184,12 +1184,35 @@ export const validateDNICheck = (
   next: NextFunction
 ): void => {
   const { dni } = req.params;
+  const { carrera_interes, institucion_slug } = req.query;
 
   if (!dni || !validateDNI(dni)) {
     res.status(400).json({
       success: false,
       error: {
         message: "dni parameter is required and must be a valid DNI format (7-8 digits)",
+        statusCode: 400,
+      },
+    });
+    return;
+  }
+
+  if (!carrera_interes || typeof carrera_interes !== "string") {
+    res.status(400).json({
+      success: false,
+      error: {
+        message: "carrera_interes query parameter is required",
+        statusCode: 400,
+      },
+    });
+    return;
+  }
+
+  if (!institucion_slug || typeof institucion_slug !== "string") {
+    res.status(400).json({
+      success: false,
+      error: {
+        message: "institucion_slug query parameter is required",
         statusCode: 400,
       },
     });

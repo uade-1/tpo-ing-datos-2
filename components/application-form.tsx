@@ -151,7 +151,7 @@ export function ApplicationForm() {
       const res = await fetch(
         `/api/v1/enrollment/check/${encodeURIComponent(
           dni
-        )}?carrera_interes=${encodeURIComponent(formData.materia)}`
+        )}?carrera_interes=${encodeURIComponent(formData.materia)}&institucion_slug=${encodeURIComponent(inst.slug)}`
       );
       const json = await res.json().catch(() => null);
 
@@ -196,13 +196,13 @@ export function ApplicationForm() {
         return;
       }
 
-      // Backend Redis availability check for DNI + materia
+      // Backend Redis availability check for DNI + materia + institution
       try {
         setIsCheckingDni(true);
         const res = await fetch(
           `/api/v1/enrollment/check/${encodeURIComponent(
             formData.dni
-          )}?carrera_interes=${encodeURIComponent(formData.materia)}`
+          )}?carrera_interes=${encodeURIComponent(formData.materia)}&institucion_slug=${encodeURIComponent(inst.slug)}`
         );
         const json = await res.json().catch(() => null);
 

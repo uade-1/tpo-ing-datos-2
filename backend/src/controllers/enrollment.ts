@@ -23,7 +23,7 @@ export const checkDNIAvailability = async (
 ): Promise<void> => {
   try {
     const { dni } = req.params;
-    const { carrera_interes } = req.query;
+    const { carrera_interes, institucion_slug } = req.query;
 
     if (!carrera_interes || typeof carrera_interes !== "string") {
       const error = new Error(
@@ -33,20 +33,29 @@ export const checkDNIAvailability = async (
       throw error;
     }
 
-    // Check if DNI exists for this specific carrera
+    if (!institucion_slug || typeof institucion_slug !== "string") {
+      const error = new Error(
+        "institucion_slug query parameter is required"
+      ) as ApiError;
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // Check if DNI exists for this specific carrera at this specific institution
     const existsForCarrera =
       await enrollmentCacheService.checkDNIExistsForCarrera(
         dni,
-        carrera_interes
+        carrera_interes,
+        institucion_slug
       );
 
-    // Get all carreras this DNI is enrolled in
-    const existingCarreras = await enrollmentCacheService.getDNICarreras(dni);
+    // Get all carreras this DNI is enrolled in (at this institution)
+    const existingCarreras = await enrollmentCacheService.getDNICarreras(dni, institucion_slug);
 
     const response: EnrollmentCheckResponse = {
       available: !existsForCarrera,
       message: existsForCarrera
-        ? `DNI already enrolled in ${carrera_interes}`
+        ? `DNI already enrolled in ${carrera_interes} at this institution`
         : existingCarreras.length > 0
         ? `DNI available for ${carrera_interes}. Currently enrolled in: ${existingCarreras.join(
             ", "
@@ -145,26 +154,27 @@ export const submitEnrollment = async (
       throw error;
     }
 
-    // Check if DNI already exists for this specific carrera (Redis + MongoDB)
+    // Check if DNI already exists for this specific carrera at this institution (Redis + MongoDB)
     const dniExistsForCarrera =
       await enrollmentCacheService.checkDNIExistsForCarrera(
         dni,
-        carrera_interes
+        carrera_interes,
+        institucion_slug
       );
     if (dniExistsForCarrera) {
       const error = new Error(
-        `DNI already enrolled in ${carrera_interes}`
+        `DNI already enrolled in ${carrera_interes} at this institution`
       ) as ApiError;
       error.statusCode = 409;
       throw error;
     }
 
-    // Atomically reserve DNI for this carrera in Redis (handles 2M+ concurrent requests)
+    // Atomically reserve DNI for this carrera at this institution in Redis (handles 2M+ concurrent requests)
     const reservationSuccess =
-      await enrollmentCacheService.reserveDNIForCarrera(dni, carrera_interes);
+      await enrollmentCacheService.reserveDNIForCarrera(dni, carrera_interes, institucion_slug);
     if (!reservationSuccess) {
       const error = new Error(
-        `DNI is currently being processed for ${carrera_interes} by another user`
+        `DNI is currently being processed for ${carrera_interes} at this institution by another user`
       ) as ApiError;
       error.statusCode = 409;
       throw error;
@@ -180,10 +190,11 @@ export const submitEnrollment = async (
 
     const savedEstudiante = await estudiante.save();
 
-    // Confirm enrollment in Redis (mark as permanently enrolled for this carrera)
+    // Confirm enrollment in Redis (mark as permanently enrolled for this carrera at this institution)
     await enrollmentCacheService.confirmEnrollmentForCarrera(
       dni,
-      carrera_interes
+      carrera_interes,
+      institucion_slug
     );
 
     // Sincronizar con Neo4j
@@ -231,10 +242,11 @@ export const submitEnrollment = async (
     });
   } catch (error) {
     // Rollback: release DNI reservation if MongoDB operation failed
-    if (dniReserved && req.body?.dni && req.body?.carrera_interes) {
+    if (dniReserved && req.body?.dni && req.body?.carrera_interes && req.body?.institucion_slug) {
       await enrollmentCacheService.releaseDNIForCarrera(
         req.body.dni,
-        req.body.carrera_interes
+        req.body.carrera_interes,
+        req.body.institucion_slug
       );
     }
     next(error);
