@@ -250,6 +250,7 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
         },
         body: JSON.stringify({
           fecha_entrevista: fechaISO,
+          estado: "ENTREVISTA", // Set estado to ENTREVISTA when fecha_entrevista is set
         }),
       });
 
@@ -259,18 +260,11 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
         throw new Error(json.error?.message || "Failed to update interview date");
       }
 
-      // Update both filtered and all estudiantes state
-      const updateStudent = (est: Estudiante) =>
-        est.id_postulante === idPostulante
-          ? { ...est, fecha_entrevista: fechaISO }
-          : est;
-
-      setAllEstudiantes((prev) => prev.map(updateStudent));
-      setEstudiantes((prev) => prev.map(updateStudent));
+      // Reload the page to refresh all data
+      window.location.reload();
     } catch (err) {
       console.error("Error updating fecha_entrevista:", err);
       alert(err instanceof Error ? err.message : "An error occurred while updating the interview date");
-    } finally {
       setUpdatingIds((prev) => {
         const newSet = new Set(prev);
         newSet.delete(idPostulante);
