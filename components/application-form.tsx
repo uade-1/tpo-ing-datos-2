@@ -244,11 +244,23 @@ export function ApplicationForm() {
     setSubmitError(null);
 
     try {
-      const institucionSlug = "your-institution-slug";
+      // Validate step 2 required fields
+      if (
+        !formData.firstName ||
+        !formData.lastName ||
+        !formData.gender ||
+        !formData.email
+      ) {
+        throw new Error(
+          "Complete nombre, apellido, género y email antes de enviar."
+        );
+      }
+
+      const institucionSlug = "universidad-buenos-aires";
 
       const idPostulante = `EST${Date.now()}`;
 
-      const apiPayload = {
+      const apiPayload: Record<string, any> = {
         id_postulante: idPostulante,
         nombre: formData.firstName,
         apellido: formData.lastName,
@@ -260,19 +272,16 @@ export function ApplicationForm() {
             : "otro",
         dni: formData.dni,
         mail: formData.email,
-        departamento_interes: formData.currentInstitution,
-        carrera_interes: formData.intendedMajor,
+        departamento_interes: formData.departamento,
+        carrera_interes: formData.materia,
         fecha_interes: new Date().toISOString(),
+        fecha_entrevista: new Date().toISOString(),
         fecha_inscripcion: new Date().toISOString(),
         estado: "INTERES",
         institucion_slug: institucionSlug,
-        documentos: {
-          dni_img: formData.transcript ? "transcript.pdf" : undefined,
-          analitico_img: formData.recommendationLetter
-            ? "recommendation.pdf"
-            : undefined,
-        },
       };
+
+      // Do NOT include documentos when not available to satisfy backend optional validation
 
       console.log("[v0] Submitting application:", apiPayload);
 
@@ -285,15 +294,20 @@ export function ApplicationForm() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to submit application");
+        const errorData = await response.json().catch(() => null);
+        const message =
+          errorData?.message ||
+          errorData?.error?.message ||
+          "Failed to submit application";
+        throw new Error(message);
       }
 
       const result = await response.json();
       console.log("[v0] Application submitted successfully:", result);
 
       alert(
-        "Application submitted successfully! You will receive a confirmation email shortly."
+        result?.data?.message ||
+          "Application submitted successfully! You will receive a confirmation email shortly."
       );
 
       // window.location.href = "/application-success"
@@ -568,10 +582,6 @@ export function ApplicationForm() {
                     <SelectContent>
                       <SelectItem value="male">Male</SelectItem>
                       <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="non-binary">Non-binary</SelectItem>
-                      <SelectItem value="prefer-not-to-say">
-                        Prefer not to say
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -625,7 +635,15 @@ export function ApplicationForm() {
             <Button
               type="submit"
               className="font-medium"
-              disabled={isSubmitting || !!dniCheckError}
+              disabled={
+                isSubmitting ||
+                !!dniCheckError ||
+                (currentStep === STEPS.length &&
+                  (!formData.firstName ||
+                    !formData.lastName ||
+                    !formData.gender ||
+                    !formData.email))
+              }
             >
               {isSubmitting ? "Submitting..." : "Submit Application"}
             </Button>
