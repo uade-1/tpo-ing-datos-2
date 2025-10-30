@@ -67,6 +67,32 @@ export function ApplicationForm() {
   }, []);
   const [isCheckingDni, setIsCheckingDni] = useState(false);
 
+  type Carrera = { key: string; label: string };
+  type Departamento = { key: string; label: string; carreras: Carrera[] };
+  const DEPARTAMENTOS: Departamento[] = [
+    {
+      key: "tecnologia",
+      label: "Tecnología",
+      carreras: [
+        { key: "ingenieria-en-sistemas", label: "Ingeniería en Sistemas" },
+        { key: "ingenieria-informatica", label: "Ingeniería Informática" },
+        { key: "desarrollo-de-software", label: "Desarrollo de Software" },
+      ],
+    },
+    {
+      key: "administracion",
+      label: "Administración",
+      carreras: [
+        {
+          key: "administracion-de-empresas",
+          label: "Administración de Empresas",
+        },
+        { key: "gestion-administrativa", label: "Gestión Administrativa" },
+        { key: "administracion-publica", label: "Administración Pública" },
+      ],
+    },
+  ];
+
   const [formData, setFormData] = useState({
     // Personal Information
     firstName: "",
@@ -360,93 +386,7 @@ export function ApplicationForm() {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="materia">
-                    Carrera <span className="text-destructive">*</span>
-                  </Label>
-                  {isClient ? (
-                    <Popover open={materiaOpen} onOpenChange={setMateriaOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          id="materia"
-                          type="button"
-                          variant="outline"
-                          className="justify-between"
-                        >
-                          {formData.materia
-                            ? formData.materia === "matematica"
-                              ? "Matemática"
-                              : formData.materia === "programacion"
-                              ? "Programación"
-                              : formData.materia === "base-de-datos"
-                              ? "Base de Datos"
-                              : formData.materia
-                            : "Seleccione una carrera"}
-                          <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="p-0" align="start">
-                        <Command>
-                          <CommandInput placeholder="Buscar carrera..." />
-                          <CommandList>
-                            <CommandEmpty>
-                              No se encontraron carreras.
-                            </CommandEmpty>
-                            <CommandGroup>
-                              <CommandItem
-                                onSelect={() => {
-                                  updateFormData("materia", "matematica");
-                                  setMateriaOpen(false);
-                                }}
-                                value="matematica"
-                              >
-                                Matemática
-                              </CommandItem>
-                              <CommandItem
-                                onSelect={() => {
-                                  updateFormData("materia", "programacion");
-                                  setMateriaOpen(false);
-                                }}
-                                value="programacion"
-                              >
-                                Programación
-                              </CommandItem>
-                              <CommandItem
-                                onSelect={() => {
-                                  updateFormData("materia", "base-de-datos");
-                                  setMateriaOpen(false);
-                                }}
-                                value="base-de-datos"
-                              >
-                                Base de Datos
-                              </CommandItem>
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  ) : (
-                    <Button
-                      id="materia"
-                      type="button"
-                      variant="outline"
-                      className="justify-between"
-                      disabled
-                    >
-                      {formData.materia
-                        ? formData.materia === "matematica"
-                          ? "Matemática"
-                          : formData.materia === "programacion"
-                          ? "Programación"
-                          : formData.materia === "base-de-datos"
-                          ? "Base de Datos"
-                          : formData.materia
-                        : "Seleccione una carrera"}
-                      <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
-                    </Button>
-                  )}
-                </div>
-
+                {/* Departamento */}
                 <div className="space-y-2">
                   <Label htmlFor="departamento">Departamento</Label>
                   {isClient ? (
@@ -461,17 +401,8 @@ export function ApplicationForm() {
                           variant="outline"
                           className="justify-between"
                         >
-                          {formData.departamento
-                            ? formData.departamento === "ingenieria"
-                              ? "Ingeniería"
-                              : formData.departamento === "ciencias-sociales"
-                              ? "Ciencias Sociales"
-                              : formData.departamento === "artes-diseno"
-                              ? "Artes y Diseño"
-                              : formData.departamento === "finanzas"
-                              ? "Finanzas"
-                              : formData.departamento
-                            : "Seleccione un departamento"}
+                          {formData.departamento ||
+                            "Seleccione un departamento"}
                           <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
                         </Button>
                       </PopoverTrigger>
@@ -483,48 +414,26 @@ export function ApplicationForm() {
                               No se encontraron departamentos.
                             </CommandEmpty>
                             <CommandGroup>
-                              <CommandItem
-                                onSelect={() => {
-                                  updateFormData("departamento", "ingenieria");
-                                  setDepartamentoOpen(false);
-                                }}
-                                value="ingenieria"
-                              >
-                                Ingeniería
-                              </CommandItem>
-                              <CommandItem
-                                onSelect={() => {
-                                  updateFormData(
-                                    "departamento",
-                                    "ciencias-sociales"
-                                  );
-                                  setDepartamentoOpen(false);
-                                }}
-                                value="ciencias-sociales"
-                              >
-                                Ciencias Sociales
-                              </CommandItem>
-                              <CommandItem
-                                onSelect={() => {
-                                  updateFormData(
-                                    "departamento",
-                                    "artes-diseno"
-                                  );
-                                  setDepartamentoOpen(false);
-                                }}
-                                value="artes-diseno"
-                              >
-                                Artes y Diseño
-                              </CommandItem>
-                              <CommandItem
-                                onSelect={() => {
-                                  updateFormData("departamento", "finanzas");
-                                  setDepartamentoOpen(false);
-                                }}
-                                value="finanzas"
-                              >
-                                Finanzas
-                              </CommandItem>
+                              {DEPARTAMENTOS.map((d) => (
+                                <CommandItem
+                                  key={d.key}
+                                  onSelect={() => {
+                                    const carrerasLabels = d.carreras.map(
+                                      (c) => c.label
+                                    );
+                                    setDepartamentoOpen(false);
+                                    updateFormData("departamento", d.label);
+                                    if (
+                                      !carrerasLabels.includes(formData.materia)
+                                    ) {
+                                      updateFormData("materia", "");
+                                    }
+                                  }}
+                                  value={d.key}
+                                >
+                                  {d.label}
+                                </CommandItem>
+                              ))}
                             </CommandGroup>
                           </CommandList>
                         </Command>
@@ -539,6 +448,70 @@ export function ApplicationForm() {
                       disabled
                     >
                       {formData.departamento || "Seleccione un departamento"}
+                      <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
+                    </Button>
+                  )}
+                </div>
+
+                {/* Carrera */}
+                <div className="space-y-2">
+                  <Label htmlFor="materia">
+                    Carrera <span className="text-destructive">*</span>
+                  </Label>
+                  {isClient ? (
+                    <Popover open={materiaOpen} onOpenChange={setMateriaOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="materia"
+                          type="button"
+                          variant="outline"
+                          className="justify-between"
+                        >
+                          {formData.materia || "Seleccione una carrera"}
+                          <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Buscar carrera..." />
+                          <CommandList>
+                            {formData.departamento ? (
+                              <CommandGroup>
+                                {(
+                                  DEPARTAMENTOS.find(
+                                    (d) => d.label === formData.departamento
+                                  )?.carreras || []
+                                ).map((c) => (
+                                  <CommandItem
+                                    key={c.key}
+                                    onSelect={() => {
+                                      updateFormData("materia", c.label);
+                                      setMateriaOpen(false);
+                                    }}
+                                    value={c.key}
+                                  >
+                                    {c.label}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            ) : (
+                              <CommandEmpty>
+                                Seleccione un departamento primero.
+                              </CommandEmpty>
+                            )}
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    <Button
+                      id="materia"
+                      type="button"
+                      variant="outline"
+                      className="justify-between"
+                      disabled
+                    >
+                      {formData.materia || "Seleccione una carrera"}
                       <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
                     </Button>
                   )}
