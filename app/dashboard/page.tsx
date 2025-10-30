@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { getAuthSession } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { EnrollmentsTable } from "@/components/dashboard/enrollments-table";
 
 function extractSlugFromHost(host: string | null): string {
   if (!host) return "uade";
@@ -43,34 +44,28 @@ export default async function DashboardPage() {
           <h2 className="text-3xl font-bold mb-2">Welcome to {slug.toUpperCase()} Dashboard</h2>
           <p className="text-gray-600">Manage your institution's enrollment and settings</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Enrollments</CardTitle>
-              <CardDescription>View and manage student enrollments</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">Dashboard content coming soon...</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistics</CardTitle>
-              <CardDescription>View enrollment statistics and analytics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">Dashboard content coming soon...</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Settings</CardTitle>
-              <CardDescription>Configure institution settings</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">Dashboard content coming soon...</p>
-            </CardContent>
-          </Card>
+        <div className="space-y-6">
+          <EnrollmentsTable institucionSlug={slug} />
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Statistics</CardTitle>
+                <CardDescription>View enrollment statistics and analytics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600">Dashboard content coming soon...</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Settings</CardTitle>
+                <CardDescription>Configure institution settings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600">Dashboard content coming soon...</p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

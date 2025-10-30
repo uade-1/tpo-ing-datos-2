@@ -56,6 +56,37 @@ export const getAllEstudiantes = async (
   }
 };
 
+export const getEstudiantesByInstitution = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { institucion_slug } = req.params;
+
+    const estudiantes = await EstudianteModel.find(
+      { institucion_slug },
+      {
+        nombre: 1,
+        apellido: 1,
+        carrera_interes: 1,
+        estado: 1,
+        id_postulante: 1,
+        dni: 1,
+        mail: 1,
+        fecha_inscripcion: 1,
+      }
+    ).sort({ fecha_inscripcion: -1 }); // Most recent first
+
+    res.status(200).json({
+      success: true,
+      data: estudiantes,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getEstudianteByIdPostulante = async (
   req: Request,
   res: Response,
