@@ -3,9 +3,7 @@ import { headers } from "next/headers";
 import { getAuthSession } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EnrollmentsTable } from "@/components/dashboard/enrollments-table";
-import { GraphVisualization } from "@/components/dashboard/graph-visualization";
-import { CassandraData } from "@/components/dashboard/cassandra-data";
+import { DashboardClient } from "./dashboard-client";
 
 function extractSlugFromHost(host: string | null): string {
   if (!host) return "uade";
@@ -47,9 +45,7 @@ export default async function DashboardPage() {
           <p className="text-gray-600">Manage your institution's enrollment and settings</p>
         </div>
         <div className="space-y-6">
-          <EnrollmentsTable institucionSlug={slug} />
-          <GraphVisualization institucionSlug={slug} />
-          <CassandraData institucionSlug={slug} />
+          <DashboardClient slug={slug} />
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>

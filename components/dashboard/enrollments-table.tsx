@@ -31,6 +31,7 @@ interface Estudiante {
 
 interface EnrollmentsTableProps {
   institucionSlug: string;
+  onStudentUpdated?: () => void;
 }
 
 const estadoColors: Record<string, string> = {
@@ -48,7 +49,7 @@ const getMinDate = () => {
 };
 const MIN_DATE = getMinDate();
 
-export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
+export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: EnrollmentsTableProps) {
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,9 +89,44 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
     }
   };
 
+  const fetchEstudiantes = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await fetch(
+        `/api/v1/estudiantes/institucion/${encodeURIComponent(institucionSlug)}`
+      );
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || "Failed to fetch enrollments");
+      }
+
+      const estudiantesData = json.data || [];
+      setEstudiantes(estudiantesData);
+      
+      // Initialize fecha_entrevista values for date inputs
+      const fechaValues: Record<string, string> = {};
+      estudiantesData.forEach((est: Estudiante) => {
+        if (est.fecha_entrevista) {
+          // Convert ISO date to YYYY-MM-DD format for date input
+          const date = new Date(est.fecha_entrevista);
+          fechaValues[est.id_postulante] = date.toISOString().split('T')[0];
+        }
+      });
+      setFechaEntrevistaValues(fechaValues);
+    } catch (err) {
+      console.error("Error fetching enrollments:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateEstudianteEstado = async (idPostulante: string, nuevoEstado: "ACEPTADO" | "RECHAZADO", comentarios: string) => {
     setUpdatingIds((prev) => new Set(prev).add(idPostulante));
     try {
+      const fechaResolucionISO = new Date().toISOString();
       const res = await fetch(`/api/v1/estudiantes/${idPostulante}`, {
         method: "PUT",
         headers: {
@@ -98,7 +134,7 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
         },
         body: JSON.stringify({
           estado: nuevoEstado,
-          fecha_resolucion: new Date().toISOString(),
+          fecha_resolucion: fechaResolucionISO,
           comite: {
             decision: nuevoEstado,
             comentarios: comentarios,
@@ -112,8 +148,7 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
         throw new Error(json.error?.message || "Failed to update student status");
       }
 
-      // Update local state
-      const fechaResolucionISO = new Date().toISOString();
+      // Update local state smoothly without full reload
       setEstudiantes((prev) =>
         prev.map((est) =>
           est.id_postulante === idPostulante
@@ -121,6 +156,21 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
             : est
         )
       );
+      
+      // Close expanded row after update
+      setExpandedRows((prev) => {
+        const newSet = new Set(prev);
+        const estudiante = estudiantes.find((e) => e.id_postulante === idPostulante);
+        if (estudiante) {
+          newSet.delete(estudiante._id);
+        }
+        return newSet;
+      });
+
+      // Notify parent to refresh Cassandra table
+      if (onStudentUpdated) {
+        onStudentUpdated();
+      }
     } catch (err) {
       console.error("Error updating student status:", err);
       alert(err instanceof Error ? err.message : "An error occurred while updating the student status");
@@ -166,7 +216,7 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
         throw new Error(json.error?.message || "Failed to update interview date");
       }
 
-      // Update local state
+      // Update local state smoothly without full reload
       setEstudiantes((prev) =>
         prev.map((est) =>
           est.id_postulante === idPostulante
@@ -187,40 +237,6 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
   };
 
   useEffect(() => {
-    const fetchEstudiantes = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const res = await fetch(
-          `/api/v1/estudiantes/institucion/${encodeURIComponent(institucionSlug)}`
-        );
-        const json = await res.json();
-
-        if (!res.ok || !json.success) {
-          throw new Error(json.error?.message || "Failed to fetch enrollments");
-        }
-
-        const estudiantesData = json.data || [];
-        setEstudiantes(estudiantesData);
-        
-        // Initialize fecha_entrevista values for date inputs
-        const fechaValues: Record<string, string> = {};
-        estudiantesData.forEach((est: Estudiante) => {
-          if (est.fecha_entrevista) {
-            // Convert ISO date to YYYY-MM-DD format for date input
-            const date = new Date(est.fecha_entrevista);
-            fechaValues[est.id_postulante] = date.toISOString().split('T')[0];
-          }
-        });
-        setFechaEntrevistaValues(fechaValues);
-      } catch (err) {
-        console.error("Error fetching enrollments:", err);
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchEstudiantes();
   }, [institucionSlug]);
 
@@ -439,8 +455,16 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
                                   <Button
                                     size="sm"
                                     onClick={() => handleAccept(estudiante.id_postulante)}
-                                    disabled={updatingIds.has(estudiante.id_postulante)}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    disabled={
+                                      updatingIds.has(estudiante.id_postulante) ||
+                                      !estudiante.fecha_entrevista
+                                    }
+                                    className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title={
+                                      !estudiante.fecha_entrevista
+                                        ? "Debe establecer una fecha de entrevista antes de aceptar"
+                                        : ""
+                                    }
                                   >
                                     {updatingIds.has(estudiante.id_postulante) ? (
                                       <>

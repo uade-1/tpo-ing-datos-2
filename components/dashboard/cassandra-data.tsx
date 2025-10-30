@@ -31,57 +31,58 @@ interface Scholarship {
 
 interface CassandraDataProps {
   institucionSlug: string;
+  refreshKey?: number;
 }
 
-export function CassandraData({ institucionSlug }: CassandraDataProps) {
+export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProps) {
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
-  useEffect(() => {
-    const fetchScholarships = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const res = await fetch(
-          `/api/v1/scholarships/${encodeURIComponent(institucionSlug)}/${selectedYear}`
-        );
-        const json = await res.json();
+  const fetchScholarships = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await fetch(
+        `/api/v1/scholarships/${encodeURIComponent(institucionSlug)}/${selectedYear}`
+      );
+      const json = await res.json();
 
-        if (!res.ok || !json.success) {
-          throw new Error(json.error?.message || "Failed to fetch Cassandra data");
-        }
-
-        // Convert Cassandra rows to our format
-        const scholarshipsData = (json.data?.scholarships || []).map((row: any) => ({
-          dni: row.dni || "",
-          id_postulante: row.id_postulante || "",
-          nombre: row.nombre || "",
-          apellido: row.apellido || "",
-          sexo: row.sexo || "",
-          mail: row.mail || "",
-          carrera_interes: row.carrera_interes || "",
-          departamento_interes: row.departamento_interes || "",
-          fecha_inscripcion: row.fecha_inscripcion ? new Date(row.fecha_inscripcion).toISOString() : "",
-          fecha_interes: row.fecha_interes ? new Date(row.fecha_interes).toISOString() : "",
-          fecha_entrevista: row.fecha_entrevista ? new Date(row.fecha_entrevista).toISOString() : undefined,
-          fecha_aceptacion: row.fecha_aceptacion ? new Date(row.fecha_aceptacion).toISOString() : "",
-          comite_decision: row.comite_decision || undefined,
-          comite_comentarios: row.comite_comentarios || undefined,
-        }));
-
-        setScholarships(scholarshipsData);
-      } catch (err) {
-        console.error("Error fetching Cassandra data:", err);
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setIsLoading(false);
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || "Failed to fetch Cassandra data");
       }
-    };
 
+      // Convert Cassandra rows to our format
+      const scholarshipsData = (json.data?.scholarships || []).map((row: any) => ({
+        dni: row.dni || "",
+        id_postulante: row.id_postulante || "",
+        nombre: row.nombre || "",
+        apellido: row.apellido || "",
+        sexo: row.sexo || "",
+        mail: row.mail || "",
+        carrera_interes: row.carrera_interes || "",
+        departamento_interes: row.departamento_interes || "",
+        fecha_inscripcion: row.fecha_inscripcion ? new Date(row.fecha_inscripcion).toISOString() : "",
+        fecha_interes: row.fecha_interes ? new Date(row.fecha_interes).toISOString() : "",
+        fecha_entrevista: row.fecha_entrevista ? new Date(row.fecha_entrevista).toISOString() : undefined,
+        fecha_aceptacion: row.fecha_aceptacion ? new Date(row.fecha_aceptacion).toISOString() : "",
+        comite_decision: row.comite_decision || undefined,
+        comite_comentarios: row.comite_comentarios || undefined,
+      }));
+
+      setScholarships(scholarshipsData);
+    } catch (err) {
+      console.error("Error fetching Cassandra data:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchScholarships();
-  }, [institucionSlug, selectedYear]);
+  }, [institucionSlug, selectedYear, refreshKey]);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
