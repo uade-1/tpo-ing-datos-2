@@ -37,6 +37,7 @@ interface GraphData {
 
 interface GraphVisualizationProps {
   institucionSlug: string;
+  refreshKey?: number;
 }
 
 const estadoColors: Record<string, string> = {
@@ -59,7 +60,7 @@ const nodeTypeSizes: Record<string, number> = {
   Estudiante: 6,
 };
 
-export function GraphVisualization({ institucionSlug }: GraphVisualizationProps) {
+export function GraphVisualization({ institucionSlug, refreshKey }: GraphVisualizationProps) {
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +90,7 @@ export function GraphVisualization({ institucionSlug }: GraphVisualizationProps)
     };
 
     fetchGraphData();
-  }, [institucionSlug]);
+  }, [institucionSlug, refreshKey]);
 
   if (isLoading) {
     return (

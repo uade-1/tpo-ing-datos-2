@@ -11,16 +11,18 @@ interface DashboardClientProps {
 
 export function DashboardClient({ slug }: DashboardClientProps) {
   const [cassandraRefreshKey, setCassandraRefreshKey] = useState(0);
+  const [graphRefreshKey, setGraphRefreshKey] = useState(0);
 
   const handleStudentUpdated = () => {
-    // Increment refresh key to trigger Cassandra table refresh
+    // Increment refresh keys to trigger both Cassandra table and Neo4j graph refresh
     setCassandraRefreshKey((prev) => prev + 1);
+    setGraphRefreshKey((prev) => prev + 1);
   };
 
   return (
     <div className="space-y-6">
       <EnrollmentsTable institucionSlug={slug} onStudentUpdated={handleStudentUpdated} />
-      <GraphVisualization institucionSlug={slug} />
+      <GraphVisualization institucionSlug={slug} refreshKey={graphRefreshKey} />
       <CassandraData institucionSlug={slug} refreshKey={cassandraRefreshKey} />
     </div>
   );
