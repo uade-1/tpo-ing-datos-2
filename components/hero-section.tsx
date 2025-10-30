@@ -2,12 +2,14 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useInstitution } from "@/components/institution-provider"
 
 /**
  * CUSTOMIZATION: Update headline, description, and hero image
  * Customize CTA button text and form fields
  */
 export function HeroSection() {
+  const inst = useInstitution()
   return (
     <section className="relative overflow-hidden border-b border-border bg-background">
       <div className="container mx-auto px-4 py-16 md:px-6 md:py-24 lg:py-32">
@@ -19,12 +21,12 @@ export function HeroSection() {
             </div>
 
             <h1 className="text-balance text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
-              Transform Your Future with Our Scholarship Program
+              {inst.theme?.mensajes?.titulo_bienvenida || "Transform Your Future with Our Scholarship Program"}
             </h1>
 
             <p className="text-pretty text-lg text-muted-foreground leading-relaxed">
-              Join thousands of students who have achieved their academic dreams through our comprehensive scholarship
-              opportunities. We support talented individuals from all backgrounds to pursue excellence in education.
+              {inst.theme?.mensajes?.subtitulo_bienvenida ||
+                "Join thousands of students who have achieved their academic dreams through our comprehensive scholarship opportunities."}
             </p>
 
             <div className="space-y-3">

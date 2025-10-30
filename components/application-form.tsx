@@ -38,6 +38,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronRight, ChevronLeft, Check, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useInstitution } from "@/components/institution-provider";
 
 const STEPS = [
   {
@@ -53,6 +54,7 @@ const STEPS = [
 ];
 
 export function ApplicationForm() {
+  const inst = useInstitution();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -256,7 +258,7 @@ export function ApplicationForm() {
         );
       }
 
-      const institucionSlug = "universidad-buenos-aires";
+      const institucionSlug = inst.slug;
 
       const idPostulante = `EST${Date.now()}`;
 

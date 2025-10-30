@@ -1,12 +1,16 @@
+"use client"
+
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useInstitution } from "@/components/institution-provider"
 
 /**
  * CUSTOMIZATION: Update contact information, social links, and footer content
  * Replace with institution-specific details
  */
 export function Footer() {
+  const inst = useInstitution()
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-16">
@@ -14,12 +18,17 @@ export function Footer() {
           {/* About section */}
           <div>
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded bg-primary-foreground/10" aria-hidden="true" />
-              <span className="text-lg font-semibold">Institution Name</span>
+              {inst.theme?.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={inst.theme.logo_url} alt={inst.nombre} className="h-8 w-8 rounded object-contain" />
+              ) : (
+                <div className="h-8 w-8 rounded bg-primary-foreground/10" aria-hidden="true" />
+              )}
+              <span className="text-lg font-semibold">{inst.nombre}</span>
             </div>
             <p className="mt-4 text-sm text-primary-foreground/80 leading-relaxed">
-              Empowering students to achieve their academic dreams through comprehensive scholarship programs and
-              unwavering support.
+              {inst.theme?.mensajes?.subtitulo_bienvenida ||
+                "Empowering students to achieve their academic dreams through comprehensive scholarship programs and unwavering support."}
             </p>
             {/* CUSTOMIZATION POINT: Update social media links */}
             <div className="mt-6 flex gap-4">
@@ -153,7 +162,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 border-t border-primary-foreground/20 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 text-sm text-primary-foreground/80 md:flex-row">
-            <p>© 2025 Institution Name. All rights reserved.</p>
+            <p>{inst.theme?.mensajes?.texto_footer || "© 2025 Institution Name. All rights reserved."}</p>
             <div className="flex gap-6">
               {/* CUSTOMIZATION POINT: Update legal links */}
               <a href="#" className="transition-colors hover:text-primary-foreground">
