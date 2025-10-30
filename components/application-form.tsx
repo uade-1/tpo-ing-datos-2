@@ -3,6 +3,7 @@
 import type React from "react";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +37,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronRight, ChevronLeft, Check, AlertCircle } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useInstitution } from "@/components/institution-provider";
 
@@ -55,9 +56,11 @@ const STEPS = [
 
 export function ApplicationForm() {
   const inst = useInstitution();
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [dniCheckError, setDniCheckError] = useState<string | null>(null);
   const [stepError, setStepError] = useState<string | null>(null);
   const [materiaOpen, setMateriaOpen] = useState(false);
@@ -289,19 +292,30 @@ export function ApplicationForm() {
       const result = await response.json();
       console.log("[v0] Application submitted successfully:", result);
 
-      alert(
+      // Show success message
+      setSubmitSuccess(
         result?.data?.message ||
           "Application submitted successfully! You will receive a confirmation email shortly."
       );
+      setSubmitError(null);
 
-      // window.location.href = "/application-success"
+      // Redirect to landing page after 3 seconds
+      setTimeout(() => {
+        router.push("/");
+      }, 3000);
     } catch (error) {
       console.error("[v0] Submission error:", error);
-      setSubmitError(
+      const errorMessage =
         error instanceof Error
           ? error.message
-          : "Failed to submit application. Please try again."
-      );
+          : "Failed to submit application. Please try again.";
+      setSubmitError(errorMessage);
+      setSubmitSuccess(null);
+
+      // Redirect to landing page after 5 seconds on error
+      setTimeout(() => {
+        router.push("/");
+      }, 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -346,14 +360,52 @@ export function ApplicationForm() {
         </div>
       </div>
 
-      {(submitError || stepError) && (
+      {/* Success Card */}
+      {submitSuccess && (
+        <Card className="border-green-500 bg-green-50">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-green-800">Success</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-green-700">{submitSuccess}</p>
+            <p className="mt-2 text-sm text-green-600">
+              Redirecting to home page...
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Error Card */}
+      {submitError && (
+        <Card className="border-red-500 bg-red-50">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <CardTitle className="text-red-800">Error</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-red-700">{submitError}</p>
+            <p className="mt-2 text-sm text-red-600">
+              Redirecting to home page...
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Step Validation Error */}
+      {stepError && !submitSuccess && !submitError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{stepError ?? submitError}</AlertDescription>
+          <AlertDescription>{stepError}</AlertDescription>
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit}>
+      {!submitSuccess && !submitError && (
+        <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
             <CardTitle>{STEPS[currentStep - 1].title}</CardTitle>
@@ -634,6 +686,7 @@ export function ApplicationForm() {
           )}
         </div>
       </form>
+      )}
     </div>
   );
 }
