@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -76,6 +76,12 @@ export function ApplicationForm() {
   const [dniCheckError, setDniCheckError] = useState<string | null>(null);
   const [stepError, setStepError] = useState<string | null>(null);
   const [materiaOpen, setMateriaOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  const [isCheckingDni, setIsCheckingDni] = useState(false);
 
   const [formData, setFormData] = useState({
     // Personal Information
@@ -125,16 +131,30 @@ export function ApplicationForm() {
 
   const checkDNI = async (dni: string) => {
     if (!dni || dni.length < 7) return;
+    // Require selected materia to perform carrera-specific Redis check
+    if (!formData.materia) return;
 
     try {
-      const institucionSlug = "your-institution-slug";
-      const response = await fetch(
-        `/api/v1/enrollment/check-dni?dni=${dni}&institucion_slug=${institucionSlug}`
+      const res = await fetch(
+        `/api/v1/enrollment/check/${encodeURIComponent(
+          dni
+        )}?carrera_interes=${encodeURIComponent(formData.materia)}`
       );
+      const json = await res.json().catch(() => null);
 
-      if (!response.ok) {
-        const data = await response.json();
-        setDniCheckError(data.message || "This DNI is already registered");
+      if (!res.ok || json?.success === false) {
+        setDniCheckError(
+          json?.data?.message || json?.message || "No se pudo verificar el DNI."
+        );
+        return;
+      }
+
+      const enrolled =
+        json?.data?.status === "ENROLLED" || json?.data?.available === false;
+      if (enrolled) {
+        setDniCheckError(
+          json?.data?.message || "DNI ya inscripto en la materia seleccionada."
+        );
       } else {
         setDniCheckError(null);
       }
@@ -143,7 +163,7 @@ export function ApplicationForm() {
     }
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     setStepError(null);
 
     if (currentStep === 1) {
@@ -161,6 +181,36 @@ export function ApplicationForm() {
       if (!formData.materia) {
         setStepError("Seleccione una materia para continuar.");
         return;
+      }
+
+      // Backend Redis availability check for DNI + materia
+      try {
+        setIsCheckingDni(true);
+        const res = await fetch(
+          `/api/v1/enrollment/check/${encodeURIComponent(
+            formData.dni
+          )}?carrera_interes=${encodeURIComponent(formData.materia)}`
+        );
+        const json = await res.json().catch(() => null);
+
+        const notOk = !res.ok || json?.success === false;
+        const enrolled =
+          json?.data?.status === "ENROLLED" || json?.data?.available === false;
+        if (notOk || enrolled) {
+          setStepError(
+            json?.data?.message ||
+              json?.message ||
+              "DNI ya inscripto en la materia seleccionada."
+          );
+          return;
+        }
+      } catch (err) {
+        setStepError(
+          "No se pudo verificar la disponibilidad. Intente nuevamente."
+        );
+        return;
+      } finally {
+        setIsCheckingDni(false);
       }
     }
 
@@ -329,66 +379,87 @@ export function ApplicationForm() {
                   <Label htmlFor="materia">
                     Materia <span className="text-destructive">*</span>
                   </Label>
-                  <Popover open={materiaOpen} onOpenChange={setMateriaOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        id="materia"
-                        type="button"
-                        variant="outline"
-                        className="justify-between"
-                      >
-                        {formData.materia
-                          ? formData.materia === "matematica"
-                            ? "Matemática"
-                            : formData.materia === "programacion"
-                            ? "Programación"
-                            : formData.materia === "base-de-datos"
-                            ? "Base de Datos"
-                            : formData.materia
-                          : "Seleccione una materia"}
-                        <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0" align="start">
-                      <Command>
-                        <CommandInput placeholder="Buscar materia..." />
-                        <CommandList>
-                          <CommandEmpty>
-                            No se encontraron materias.
-                          </CommandEmpty>
-                          <CommandGroup>
-                            <CommandItem
-                              onSelect={() => {
-                                updateFormData("materia", "matematica");
-                                setMateriaOpen(false);
-                              }}
-                              value="matematica"
-                            >
-                              Matemática
-                            </CommandItem>
-                            <CommandItem
-                              onSelect={() => {
-                                updateFormData("materia", "programacion");
-                                setMateriaOpen(false);
-                              }}
-                              value="programacion"
-                            >
-                              Programación
-                            </CommandItem>
-                            <CommandItem
-                              onSelect={() => {
-                                updateFormData("materia", "base-de-datos");
-                                setMateriaOpen(false);
-                              }}
-                              value="base-de-datos"
-                            >
-                              Base de Datos
-                            </CommandItem>
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  {isClient ? (
+                    <Popover open={materiaOpen} onOpenChange={setMateriaOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="materia"
+                          type="button"
+                          variant="outline"
+                          className="justify-between"
+                        >
+                          {formData.materia
+                            ? formData.materia === "matematica"
+                              ? "Matemática"
+                              : formData.materia === "programacion"
+                              ? "Programación"
+                              : formData.materia === "base-de-datos"
+                              ? "Base de Datos"
+                              : formData.materia
+                            : "Seleccione una materia"}
+                          <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Buscar materia..." />
+                          <CommandList>
+                            <CommandEmpty>
+                              No se encontraron materias.
+                            </CommandEmpty>
+                            <CommandGroup>
+                              <CommandItem
+                                onSelect={() => {
+                                  updateFormData("materia", "matematica");
+                                  setMateriaOpen(false);
+                                }}
+                                value="matematica"
+                              >
+                                Matemática
+                              </CommandItem>
+                              <CommandItem
+                                onSelect={() => {
+                                  updateFormData("materia", "programacion");
+                                  setMateriaOpen(false);
+                                }}
+                                value="programacion"
+                              >
+                                Programación
+                              </CommandItem>
+                              <CommandItem
+                                onSelect={() => {
+                                  updateFormData("materia", "base-de-datos");
+                                  setMateriaOpen(false);
+                                }}
+                                value="base-de-datos"
+                              >
+                                Base de Datos
+                              </CommandItem>
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    <Button
+                      id="materia"
+                      type="button"
+                      variant="outline"
+                      className="justify-between"
+                      disabled
+                    >
+                      {formData.materia
+                        ? formData.materia === "matematica"
+                          ? "Matemática"
+                          : formData.materia === "programacion"
+                          ? "Programación"
+                          : formData.materia === "base-de-datos"
+                          ? "Base de Datos"
+                          : formData.materia
+                        : "Seleccione una materia"}
+                      <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
+                    </Button>
+                  )}
                 </div>
               </div>
             )}
@@ -929,8 +1000,16 @@ export function ApplicationForm() {
           </Button>
 
           {currentStep < STEPS.length ? (
-            <Button type="button" onClick={nextStep} disabled={isSubmitting}>
-              {currentStep === 1 ? "Aplicar" : "Next"}
+            <Button
+              type="button"
+              onClick={nextStep}
+              disabled={isSubmitting || isCheckingDni}
+            >
+              {currentStep === 1
+                ? isCheckingDni
+                  ? "Verificando..."
+                  : "Aplicar"
+                : "Next"}
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
