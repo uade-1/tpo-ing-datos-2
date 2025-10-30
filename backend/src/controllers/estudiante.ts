@@ -70,11 +70,14 @@ export const getEstudiantesByInstitution = async (
         nombre: 1,
         apellido: 1,
         carrera_interes: 1,
+        departamento_interes: 1,
         estado: 1,
         id_postulante: 1,
         dni: 1,
         mail: 1,
         fecha_inscripcion: 1,
+        fecha_interes: 1,
+        fecha_entrevista: 1,
       }
     ).sort({ fecha_inscripcion: -1 }); // Most recent first
 
