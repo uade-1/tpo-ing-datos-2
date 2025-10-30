@@ -132,6 +132,16 @@ export const updateEstudiante = async (
       throw error;
     }
 
+    // Auto-generate comite_id and fecha_revision if comite is provided but missing these fields
+    if (updateData.comite && typeof updateData.comite === "object") {
+      if (!updateData.comite.comite_id) {
+        updateData.comite.comite_id = `COM${Date.now()}`;
+      }
+      if (!updateData.comite.fecha_revision) {
+        updateData.comite.fecha_revision = new Date().toISOString();
+      }
+    }
+
     const estudiante = await EstudianteModel.findOneAndUpdate(
       { id_postulante },
       { $set: updateData },

@@ -73,6 +73,30 @@ const validateEstudianteComite = (comite: any): boolean => {
   );
 };
 
+// More lenient validation for updates - allows auto-generation of comite_id and fecha_revision
+const validateEstudianteComiteUpdate = (comite: any): boolean => {
+  if (!comite || typeof comite !== "object") {
+    return false;
+  }
+  // decision and comentarios are required
+  if (
+    typeof comite.decision !== "string" ||
+    comite.decision.trim().length === 0 ||
+    typeof comite.comentarios !== "string" ||
+    comite.comentarios.trim().length === 0
+  ) {
+    return false;
+  }
+  // comite_id and fecha_revision are optional (will be auto-generated if missing)
+  if (comite.comite_id !== undefined && (typeof comite.comite_id !== "string" || comite.comite_id.trim().length === 0)) {
+    return false;
+  }
+  if (comite.fecha_revision !== undefined && !validateDate(comite.fecha_revision)) {
+    return false;
+  }
+  return true;
+};
+
 const validateComiteMiembro = (miembro: any): boolean => {
   return (
     miembro &&
@@ -756,11 +780,11 @@ export const validateCreateEstudiante = (
     return;
   }
 
-  if (comite !== undefined && !validateEstudianteComite(comite)) {
+  if (comite !== undefined && !validateEstudianteComiteUpdate(comite)) {
     res.status(400).json({
       success: false,
       error: {
-        message: "comite must be an object with comite_id, fecha_revision, decision, and comentarios",
+        message: "comite must be an object with decision and comentarios (comite_id and fecha_revision are optional)",
         statusCode: 400,
       },
     });
@@ -935,11 +959,11 @@ export const validateUpdateEstudiante = (
     return;
   }
 
-  if (comite !== undefined && !validateEstudianteComite(comite)) {
+  if (comite !== undefined && !validateEstudianteComiteUpdate(comite)) {
     res.status(400).json({
       success: false,
       error: {
-        message: "comite must be an object with comite_id, fecha_revision, decision, and comentarios",
+        message: "comite must be an object with decision and comentarios (comite_id and fecha_revision are optional)",
         statusCode: 400,
       },
     });
@@ -1164,11 +1188,11 @@ export const validateEnrollmentSubmission = (
     return;
   }
 
-  if (comite !== undefined && !validateEstudianteComite(comite)) {
+  if (comite !== undefined && !validateEstudianteComiteUpdate(comite)) {
     res.status(400).json({
       success: false,
       error: {
-        message: "comite must be an object with comite_id, fecha_revision, decision, and comentarios",
+        message: "comite must be an object with decision and comentarios (comite_id and fecha_revision are optional)",
         statusCode: 400,
       },
     });

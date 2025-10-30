@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronDown, ChevronRight } from "lucide-react";
+import { Loader2, ChevronDown, ChevronRight, CheckCircle, XCircle } from "lucide-react";
 
 interface Estudiante {
   _id: string;
@@ -44,6 +44,7 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
 
   const toggleRow = (id: string) => {
     const newExpanded = new Set(expandedRows);
@@ -66,6 +67,57 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
     } catch {
       return dateString;
     }
+  };
+
+  const updateEstudianteEstado = async (idPostulante: string, nuevoEstado: "ACEPTADO" | "RECHAZADO", comentarios: string) => {
+    setUpdatingIds((prev) => new Set(prev).add(idPostulante));
+    try {
+      const res = await fetch(`/api/v1/estudiantes/${idPostulante}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          estado: nuevoEstado,
+          comite: {
+            decision: nuevoEstado,
+            comentarios: comentarios,
+          },
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || "Failed to update student status");
+      }
+
+      // Update local state
+      setEstudiantes((prev) =>
+        prev.map((est) =>
+          est.id_postulante === idPostulante
+            ? { ...est, estado: nuevoEstado }
+            : est
+        )
+      );
+    } catch (err) {
+      console.error("Error updating student status:", err);
+      alert(err instanceof Error ? err.message : "An error occurred while updating the student status");
+    } finally {
+      setUpdatingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(idPostulante);
+        return newSet;
+      });
+    }
+  };
+
+  const handleAccept = (idPostulante: string) => {
+    updateEstudianteEstado(idPostulante, "ACEPTADO", "Estudiante aceptado para la beca");
+  };
+
+  const handleReject = (idPostulante: string) => {
+    updateEstudianteEstado(idPostulante, "RECHAZADO", "Estudiante rechazado");
   };
 
   useEffect(() => {
@@ -188,7 +240,7 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
                       <TableRow>
                         <TableCell colSpan={4} className="bg-gray-50">
                           <div className="px-4 py-4">
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-4">
                               <div>
                                 <p className="font-semibold text-gray-700 mb-1">ID Postulante</p>
                                 <p className="text-gray-600">{estudiante.id_postulante}</p>
@@ -240,6 +292,47 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
                                 </span>
                               </div>
                             </div>
+                            {estudiante.estado !== "ACEPTADO" && estudiante.estado !== "RECHAZADO" && (
+                              <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleReject(estudiante.id_postulante)}
+                                  disabled={updatingIds.has(estudiante.id_postulante)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  {updatingIds.has(estudiante.id_postulante) ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                      Procesando...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <XCircle className="h-4 w-4 mr-2" />
+                                      Rechazar
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleAccept(estudiante.id_postulante)}
+                                  disabled={updatingIds.has(estudiante.id_postulante)}
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                >
+                                  {updatingIds.has(estudiante.id_postulante) ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                      Procesando...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle className="h-4 w-4 mr-2" />
+                                      Aceptar
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
