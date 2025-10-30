@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronDown, ChevronRight, CheckCircle, XCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, ChevronDown, ChevronRight, CheckCircle, XCircle, Calendar } from "lucide-react";
 
 interface Estudiante {
   _id: string;
@@ -25,7 +26,7 @@ interface Estudiante {
   mail: string;
   fecha_inscripcion: string;
   fecha_interes: string;
-  fecha_entrevista: string;
+  fecha_entrevista?: string;
 }
 
 interface EnrollmentsTableProps {
@@ -45,6 +46,7 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
   const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
+  const [fechaEntrevistaValues, setFechaEntrevistaValues] = useState<Record<string, string>>({});
 
   const toggleRow = (id: string) => {
     const newExpanded = new Set(expandedRows);
@@ -52,11 +54,20 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
       newExpanded.delete(id);
     } else {
       newExpanded.add(id);
+      // Initialize fecha_entrevista value when expanding row
+      const estudiante = estudiantes.find((e) => e._id === id);
+      if (estudiante && estudiante.fecha_entrevista && !fechaEntrevistaValues[estudiante.id_postulante]) {
+        const date = new Date(estudiante.fecha_entrevista);
+        setFechaEntrevistaValues((prev) => ({
+          ...prev,
+          [estudiante.id_postulante]: date.toISOString().split('T')[0],
+        }));
+      }
     }
     setExpandedRows(newExpanded);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     try {
       return new Date(dateString).toLocaleDateString("en-US", {
@@ -120,6 +131,51 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
     updateEstudianteEstado(idPostulante, "RECHAZADO", "Estudiante rechazado");
   };
 
+  const handleSetFechaEntrevista = async (idPostulante: string, fechaValue: string) => {
+    if (!fechaValue) {
+      alert("Please select a date");
+      return;
+    }
+
+    setUpdatingIds((prev) => new Set(prev).add(idPostulante));
+    try {
+      const fechaISO = new Date(fechaValue).toISOString();
+      const res = await fetch(`/api/v1/estudiantes/${idPostulante}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fecha_entrevista: fechaISO,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || "Failed to update interview date");
+      }
+
+      // Update local state
+      setEstudiantes((prev) =>
+        prev.map((est) =>
+          est.id_postulante === idPostulante
+            ? { ...est, fecha_entrevista: fechaISO }
+            : est
+        )
+      );
+    } catch (err) {
+      console.error("Error updating fecha_entrevista:", err);
+      alert(err instanceof Error ? err.message : "An error occurred while updating the interview date");
+    } finally {
+      setUpdatingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(idPostulante);
+        return newSet;
+      });
+    }
+  };
+
   useEffect(() => {
     const fetchEstudiantes = async () => {
       try {
@@ -134,7 +190,19 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
           throw new Error(json.error?.message || "Failed to fetch enrollments");
         }
 
-        setEstudiantes(json.data || []);
+        const estudiantesData = json.data || [];
+        setEstudiantes(estudiantesData);
+        
+        // Initialize fecha_entrevista values for date inputs
+        const fechaValues: Record<string, string> = {};
+        estudiantesData.forEach((est: Estudiante) => {
+          if (est.fecha_entrevista) {
+            // Convert ISO date to YYYY-MM-DD format for date input
+            const date = new Date(est.fecha_entrevista);
+            fechaValues[est.id_postulante] = date.toISOString().split('T')[0];
+          }
+        });
+        setFechaEntrevistaValues(fechaValues);
       } catch (err) {
         console.error("Error fetching enrollments:", err);
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -277,9 +345,57 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
                                 <p className="font-semibold text-gray-700 mb-1">Fecha de Inscripción</p>
                                 <p className="text-gray-600">{formatDate(estudiante.fecha_inscripcion)}</p>
                               </div>
-                              <div>
-                                <p className="font-semibold text-gray-700 mb-1">Fecha de Entrevista</p>
-                                <p className="text-gray-600">{formatDate(estudiante.fecha_entrevista)}</p>
+                              <div className="md:col-span-3">
+                                <p className="font-semibold text-gray-700 mb-2">Fecha de Entrevista</p>
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    type="date"
+                                    value={fechaEntrevistaValues[estudiante.id_postulante] || ""}
+                                    onChange={(e) => {
+                                      setFechaEntrevistaValues((prev) => ({
+                                        ...prev,
+                                        [estudiante.id_postulante]: e.target.value,
+                                      }));
+                                    }}
+                                    className="max-w-xs"
+                                    disabled={updatingIds.has(estudiante.id_postulante)}
+                                  />
+                                  <Button
+                                    size="sm"
+                                    onClick={() => {
+                                      const fechaValue = fechaEntrevistaValues[estudiante.id_postulante];
+                                      if (fechaValue) {
+                                        handleSetFechaEntrevista(estudiante.id_postulante, fechaValue);
+                                      }
+                                    }}
+                                    disabled={
+                                      updatingIds.has(estudiante.id_postulante) ||
+                                      !fechaEntrevistaValues[estudiante.id_postulante] ||
+                                      fechaEntrevistaValues[estudiante.id_postulante] ===
+                                        (estudiante.fecha_entrevista
+                                          ? new Date(estudiante.fecha_entrevista).toISOString().split('T')[0]
+                                          : "")
+                                    }
+                                    variant="outline"
+                                  >
+                                    {updatingIds.has(estudiante.id_postulante) ? (
+                                      <>
+                                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                        Guardando...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Calendar className="h-3 w-3 mr-1" />
+                                        Guardar
+                                      </>
+                                    )}
+                                  </Button>
+                                </div>
+                                {estudiante.fecha_entrevista && (
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Actual: {formatDate(estudiante.fecha_entrevista)}
+                                  </p>
+                                )}
                               </div>
                               <div>
                                 <p className="font-semibold text-gray-700 mb-1">Estado</p>

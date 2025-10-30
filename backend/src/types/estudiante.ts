@@ -23,7 +23,7 @@ export interface Estudiante {
   departamento_interes: string;
   carrera_interes: string;
   fecha_interes: Date;
-  fecha_entrevista: Date;
+  fecha_entrevista?: Date;
   estado: "ENTREVISTA" | "INTERES" | "ACEPTADO" | "RECHAZADO";
   documentos: EstudianteDocumentos;
   comite: EstudianteComite;
@@ -42,7 +42,7 @@ export interface CreateEstudianteRequest {
   departamento_interes: string;
   carrera_interes: string;
   fecha_interes: Date;
-  fecha_entrevista: Date;
+  fecha_entrevista?: Date;
   estado: "ENTREVISTA" | "INTERES" | "ACEPTADO" | "RECHAZADO";
   documentos?: EstudianteDocumentos;
   comite?: EstudianteComite;

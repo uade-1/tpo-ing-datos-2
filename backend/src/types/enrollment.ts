@@ -21,7 +21,7 @@ export interface EnrollmentRequest {
   departamento_interes: string;
   carrera_interes: string;
   fecha_interes: Date;
-  fecha_entrevista: Date;
+  fecha_entrevista?: Date;
   estado: "ENTREVISTA" | "INTERES" | "ACEPTADO" | "RECHAZADO";
   documentos?: {
     dni_img: string;

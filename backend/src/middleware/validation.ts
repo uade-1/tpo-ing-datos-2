@@ -736,11 +736,11 @@ export const validateCreateEstudiante = (
     return;
   }
 
-  if (!fecha_entrevista || !validateDate(fecha_entrevista)) {
+  if (fecha_entrevista !== undefined && !validateDate(fecha_entrevista)) {
     res.status(400).json({
       success: false,
       error: {
-        message: "fecha_entrevista is required and must be a valid date",
+        message: "fecha_entrevista must be a valid date",
         statusCode: 400,
       },
     });
@@ -1133,11 +1133,11 @@ export const validateEnrollmentSubmission = (
     return;
   }
 
-  if (!fecha_entrevista || !validateDate(fecha_entrevista)) {
+  if (fecha_entrevista !== undefined && !validateDate(fecha_entrevista)) {
     res.status(400).json({
       success: false,
       error: {
-        message: "fecha_entrevista is required and must be a valid date",
+        message: "fecha_entrevista must be a valid date",
         statusCode: 400,
       },
     });

@@ -34,7 +34,7 @@ const EstudianteSchema = new Schema<Estudiante & Document>(
     departamento_interes: { type: String, required: true },
     carrera_interes: { type: String, required: true },
     fecha_interes: { type: Date, required: true },
-    fecha_entrevista: { type: Date, required: true },
+    fecha_entrevista: { type: Date, required: false },
     estado: {
       type: String,
       required: true,
