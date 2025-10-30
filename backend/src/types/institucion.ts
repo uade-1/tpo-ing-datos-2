@@ -24,6 +24,15 @@ export interface InstitucionMetadata {
   version_config: number;
 }
 
+export interface Carrera {
+  nombre: string;
+}
+
+export interface Departamento {
+  nombre: string;
+  carreras: Carrera[];
+}
+
 export interface ComiteMiembro {
   miembro_id: string;
   nombre: string;
@@ -56,6 +65,7 @@ export interface Institucion {
   configuracion_tema: InstitucionConfiguracionTema;
   comite: Comite;
   metadata: InstitucionMetadata;
+  departamentos?: Departamento[];
 }
 
 export interface CreateInstitucionRequest {
@@ -64,6 +74,7 @@ export interface CreateInstitucionRequest {
   estado: "ACTIVA" | "INACTIVA" | "PENDIENTE_CONFIGURACION";
   configuracion_tema: InstitucionConfiguracionTema;
   comite?: CreateComiteRequest;
+  departamentos?: Departamento[];
 }
 
 export interface UpdateInstitucionRequest {
@@ -72,4 +83,5 @@ export interface UpdateInstitucionRequest {
   estado?: "ACTIVA" | "INACTIVA" | "PENDIENTE_CONFIGURACION";
   configuracion_tema?: Partial<InstitucionConfiguracionTema>;
   comite?: CreateComiteRequest;
+  departamentos?: Departamento[];
 }

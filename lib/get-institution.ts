@@ -14,11 +14,21 @@ export type InstitutionTheme = {
   };
 };
 
+export type Carrera = {
+  nombre: string;
+};
+
+export type Departamento = {
+  nombre: string;
+  carreras: Carrera[];
+};
+
 export type Institution = {
   nombre: string;
   slug: string;
   descripcion?: string;
   configuracion_tema?: InstitutionTheme;
+  departamentos?: Departamento[];
 };
 
 export async function fetchInstitutionBySlug(slug: string): Promise<Institution | null> {

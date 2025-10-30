@@ -79,11 +79,11 @@ export default async function RootLayout({
   } as React.CSSProperties
 
   return (
-    <html lang="en" style={cssVars}>
-      <body className={`font-sans antialiased`}>
-        <InstitutionProvider
-          value={{ slug: institution.slug, nombre: institution.nombre, theme }}
-        >
+        <html lang="en" style={cssVars}>
+          <body className={`font-sans antialiased`}>
+            <InstitutionProvider
+              value={{ slug: institution.slug, nombre: institution.nombre, theme, departamentos: institution.departamentos }}
+            >
           <ThemeInjector />
           {children}
         </InstitutionProvider>

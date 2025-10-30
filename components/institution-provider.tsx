@@ -7,6 +7,7 @@ export type InstitutionContextValue = {
   slug: string;
   nombre: string;
   theme: Institution["configuracion_tema"];
+  departamentos?: Institution["departamentos"];
 };
 
 const InstitutionContext = createContext<InstitutionContextValue | null>(null);

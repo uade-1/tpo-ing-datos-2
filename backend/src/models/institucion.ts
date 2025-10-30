@@ -65,6 +65,21 @@ const InstitucionMetadataSchema = new Schema(
   { _id: false }
 );
 
+const CarreraSchema = new Schema(
+  {
+    nombre: { type: String, required: true },
+  },
+  { _id: false }
+);
+
+const DepartamentoSchema = new Schema(
+  {
+    nombre: { type: String, required: true },
+    carreras: { type: [CarreraSchema], required: true, default: [] },
+  },
+  { _id: false }
+);
+
 const InstitucionSchema = new Schema<Institucion & Document>(
   {
     slug: { type: String, required: true, unique: true },
@@ -80,6 +95,7 @@ const InstitucionSchema = new Schema<Institucion & Document>(
     },
     comite: { type: ComiteSchema, required: false, default: () => ({}) },
     metadata: { type: InstitucionMetadataSchema, required: false },
+    departamentos: { type: [DepartamentoSchema], required: false, default: [] },
   },
   {
     timestamps: false,

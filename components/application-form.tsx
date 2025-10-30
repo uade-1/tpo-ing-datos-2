@@ -69,31 +69,15 @@ export function ApplicationForm() {
   }, []);
   const [isCheckingDni, setIsCheckingDni] = useState(false);
 
-  type Carrera = { key: string; label: string };
-  type Departamento = { key: string; label: string; carreras: Carrera[] };
-  const DEPARTAMENTOS: Departamento[] = [
-    {
-      key: "tecnologia",
-      label: "Tecnología",
-      carreras: [
-        { key: "ingenieria-en-sistemas", label: "Ingeniería en Sistemas" },
-        { key: "ingenieria-informatica", label: "Ingeniería Informática" },
-        { key: "desarrollo-de-software", label: "Desarrollo de Software" },
-      ],
-    },
-    {
-      key: "administracion",
-      label: "Administración",
-      carreras: [
-        {
-          key: "administracion-de-empresas",
-          label: "Administración de Empresas",
-        },
-        { key: "gestion-administrativa", label: "Gestión Administrativa" },
-        { key: "administracion-publica", label: "Administración Pública" },
-      ],
-    },
-  ];
+  // Get departamentos from institution - map to the format expected by the form
+  const DEPARTAMENTOS = (inst.departamentos || []).map((dept) => ({
+    key: dept.nombre.toLowerCase().replace(/\s+/g, "-"),
+    label: dept.nombre,
+    carreras: dept.carreras.map((carrera) => ({
+      key: carrera.nombre.toLowerCase().replace(/\s+/g, "-"),
+      label: carrera.nombre,
+    })),
+  }));
 
   const [formData, setFormData] = useState({
     // Personal Information
