@@ -42,7 +42,7 @@ const EstudianteSchema = new Schema<Estudiante & Document>(
     },
     documentos: { type: EstudianteDocumentosSchema, required: false },
     comite: { type: EstudianteComiteSchema, required: false },
-    fecha_inscripcion: { type: Date, required: true },
+    fecha_resolucion: { type: Date, required: false },
     institucion_slug: { type: String, required: true },
     enrollment_status: {
       type: String,

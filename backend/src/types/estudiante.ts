@@ -27,7 +27,7 @@ export interface Estudiante {
   estado: "ENTREVISTA" | "INTERES" | "ACEPTADO" | "RECHAZADO";
   documentos: EstudianteDocumentos;
   comite: EstudianteComite;
-  fecha_inscripcion: Date;
+  fecha_resolucion?: Date;
   institucion_slug: string;
   enrollment_status: EnrollmentStatus;
 }
@@ -46,7 +46,7 @@ export interface CreateEstudianteRequest {
   estado: "ENTREVISTA" | "INTERES" | "ACEPTADO" | "RECHAZADO";
   documentos?: EstudianteDocumentos;
   comite?: EstudianteComite;
-  fecha_inscripcion: Date;
+  fecha_resolucion?: Date;
   institucion_slug: string;
   enrollment_status?: EnrollmentStatus;
 }
@@ -65,7 +65,7 @@ export interface UpdateEstudianteRequest {
   estado?: "ENTREVISTA" | "INTERES" | "ACEPTADO" | "RECHAZADO";
   documentos?: Partial<EstudianteDocumentos>;
   comite?: Partial<EstudianteComite>;
-  fecha_inscripcion?: Date;
+  fecha_resolucion?: Date;
   institucion_slug?: string;
   enrollment_status?: EnrollmentStatus;
 }

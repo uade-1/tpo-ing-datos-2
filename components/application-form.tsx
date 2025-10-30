@@ -277,7 +277,6 @@ export function ApplicationForm() {
         departamento_interes: formData.departamento,
         carrera_interes: formData.materia,
         fecha_interes: new Date().toISOString(),
-        fecha_inscripcion: new Date().toISOString(),
         estado: "INTERES",
         institucion_slug: institucionSlug,
       };

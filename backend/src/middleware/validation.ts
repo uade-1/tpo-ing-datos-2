@@ -634,7 +634,7 @@ export const validateCreateEstudiante = (
     estado,
     documentos,
     comite,
-    fecha_inscripcion,
+    fecha_resolucion,
   } = req.body as CreateEstudianteRequest;
 
   if (!id_postulante || typeof id_postulante !== "string" || id_postulante.trim().length === 0) {
@@ -758,11 +758,11 @@ export const validateCreateEstudiante = (
     return;
   }
 
-  if (!fecha_inscripcion || !validateDate(fecha_inscripcion)) {
+  if (fecha_resolucion !== undefined && !validateDate(fecha_resolucion)) {
     res.status(400).json({
       success: false,
       error: {
-        message: "fecha_inscripcion is required and must be a valid date",
+        message: "fecha_resolucion must be a valid date",
         statusCode: 400,
       },
     });
@@ -813,7 +813,7 @@ export const validateUpdateEstudiante = (
     estado,
     documentos,
     comite,
-    fecha_inscripcion,
+    fecha_resolucion,
   } = req.body as UpdateEstudianteRequest;
 
   if (id_postulante !== undefined && (typeof id_postulante !== "string" || id_postulante.trim().length === 0)) {
@@ -937,11 +937,11 @@ export const validateUpdateEstudiante = (
     return;
   }
 
-  if (fecha_inscripcion !== undefined && !validateDate(fecha_inscripcion)) {
+  if (fecha_resolucion !== undefined && !validateDate(fecha_resolucion)) {
     res.status(400).json({
       success: false,
       error: {
-        message: "fecha_inscripcion must be a valid date",
+        message: "fecha_resolucion must be a valid date",
         statusCode: 400,
       },
     });
@@ -1030,7 +1030,7 @@ export const validateEnrollmentSubmission = (
     estado,
     documentos,
     comite,
-    fecha_inscripcion,
+    fecha_resolucion,
     institucion_slug,
   } = req.body as EnrollmentRequest;
 
@@ -1155,11 +1155,11 @@ export const validateEnrollmentSubmission = (
     return;
   }
 
-  if (!fecha_inscripcion || !validateDate(fecha_inscripcion)) {
+  if (fecha_resolucion !== undefined && !validateDate(fecha_resolucion)) {
     res.status(400).json({
       success: false,
       error: {
-        message: "fecha_inscripcion is required and must be a valid date",
+        message: "fecha_resolucion must be a valid date",
         statusCode: 400,
       },
     });

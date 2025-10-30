@@ -24,7 +24,7 @@ interface Estudiante {
   estado: "ENTREVISTA" | "INTERES" | "ACEPTADO" | "RECHAZADO";
   dni: string;
   mail: string;
-  fecha_inscripcion: string;
+  fecha_resolucion?: string;
   fecha_interes: string;
   fecha_entrevista?: string;
 }
@@ -98,6 +98,7 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
         },
         body: JSON.stringify({
           estado: nuevoEstado,
+          fecha_resolucion: new Date().toISOString(),
           comite: {
             decision: nuevoEstado,
             comentarios: comentarios,
@@ -112,10 +113,11 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
       }
 
       // Update local state
+      const fechaResolucionISO = new Date().toISOString();
       setEstudiantes((prev) =>
         prev.map((est) =>
           est.id_postulante === idPostulante
-            ? { ...est, estado: nuevoEstado }
+            ? { ...est, estado: nuevoEstado, fecha_resolucion: fechaResolucionISO }
             : est
         )
       );
@@ -350,8 +352,8 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
                                 <p className="text-gray-600">{formatDate(estudiante.fecha_interes)}</p>
                               </div>
                               <div>
-                                <p className="font-semibold text-gray-700 mb-1">Fecha de Inscripción</p>
-                                <p className="text-gray-600">{formatDate(estudiante.fecha_inscripcion)}</p>
+                                <p className="font-semibold text-gray-700 mb-1">Fecha de Resolución</p>
+                                <p className="text-gray-600">{formatDate(estudiante.fecha_resolucion)}</p>
                               </div>
                               <div className="md:col-span-3">
                                 <p className="font-semibold text-gray-700 mb-2">Fecha de Entrevista</p>

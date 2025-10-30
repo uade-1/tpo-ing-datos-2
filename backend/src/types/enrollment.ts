@@ -33,7 +33,7 @@ export interface EnrollmentRequest {
     decision: string;
     comentarios: string;
   };
-  fecha_inscripcion: Date;
+  fecha_resolucion?: Date;
   institucion_slug: string;
 }
 

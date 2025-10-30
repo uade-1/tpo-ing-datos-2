@@ -75,11 +75,11 @@ export const getEstudiantesByInstitution = async (
         id_postulante: 1,
         dni: 1,
         mail: 1,
-        fecha_inscripcion: 1,
+        fecha_resolucion: 1,
         fecha_interes: 1,
         fecha_entrevista: 1,
       }
-    ).sort({ fecha_inscripcion: -1 }); // Most recent first
+    ).sort({ fecha_resolucion: -1 }); // Most recent first
 
     res.status(200).json({
       success: true,
@@ -193,7 +193,9 @@ export const updateEstudiante = async (
       existingEstudiante.estado === "ACEPTADO"
     ) {
       try {
-        const año = new Date(estudiante.fecha_inscripcion).getFullYear();
+        const año = estudiante.fecha_resolucion
+          ? new Date(estudiante.fecha_resolucion).getFullYear()
+          : new Date().getFullYear();
         await cassandraService.updateScholarship(
           estudiante.institucion_slug,
           año,
