@@ -1,64 +1,13 @@
 "use client"
 
-import type React from "react"
-
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useState } from "react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { CheckCircle2, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 /**
  * CUSTOMIZATION: Update headline, description, and hero image
  * Customize CTA button text and form fields
  */
 export function HeroSection() {
-  const [email, setEmail] = useState("")
-  const [isSubscribing, setIsSubscribing] = useState(false)
-  const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "success" | "error">("idle")
-  const [errorMessage, setErrorMessage] = useState("")
-
-  const handleEmailSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubscribing(true)
-    setSubscribeStatus("idle")
-    setErrorMessage("")
-
-    try {
-      const institucionSlug = "your-institution-slug"
-
-      const response = await fetch("/api/v1/enrollment/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          institucion_slug: institucionSlug,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to subscribe")
-      }
-
-      console.log("[v0] Email subscription successful")
-      setSubscribeStatus("success")
-      setEmail("")
-
-      setTimeout(() => {
-        window.location.href = "/apply"
-      }, 2000)
-    } catch (error) {
-      console.error("[v0] Subscription error:", error)
-      setSubscribeStatus("error")
-      setErrorMessage(error instanceof Error ? error.message : "Failed to subscribe. Please try again.")
-    } finally {
-      setIsSubscribing(false)
-    }
-  }
-
   return (
     <section className="relative overflow-hidden border-b border-border bg-background">
       <div className="container mx-auto px-4 py-16 md:px-6 md:py-24 lg:py-32">
@@ -78,37 +27,13 @@ export function HeroSection() {
               opportunities. We support talented individuals from all backgrounds to pursue excellence in education.
             </p>
 
-            <form onSubmit={handleEmailSubscribe} className="space-y-3">
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Input
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="flex-1"
-                  aria-label="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isSubscribing}
-                />
-                <Button type="submit" size="lg" className="w-full font-medium sm:w-auto" disabled={isSubscribing}>
-                  {isSubscribing ? "Subscribing..." : "Get Started"}
+            <div className="space-y-3">
+              <Link href="/apply">
+                <Button size="lg" className="w-full font-medium sm:w-auto">
+                  Apply Now
                 </Button>
-              </div>
-
-              {subscribeStatus === "success" && (
-                <Alert className="border-green-500 bg-green-50 text-green-900">
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  <AlertDescription>Successfully subscribed! Redirecting to application...</AlertDescription>
-                </Alert>
-              )}
-
-              {subscribeStatus === "error" && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{errorMessage}</AlertDescription>
-                </Alert>
-              )}
-            </form>
+              </Link>
+            </div>
 
             <p className="text-sm text-muted-foreground">
               By submitting, you agree to receive information about our scholarship programs.
