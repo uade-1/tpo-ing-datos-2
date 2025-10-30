@@ -12,7 +12,15 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, ChevronDown, ChevronRight, CheckCircle, XCircle, Calendar } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2, ChevronDown, ChevronRight, CheckCircle, XCircle, Calendar, Filter } from "lucide-react";
 
 interface Estudiante {
   _id: string;
@@ -51,11 +59,16 @@ const MIN_DATE = getMinDate();
 
 export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: EnrollmentsTableProps) {
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
+  const [allEstudiantes, setAllEstudiantes] = useState<Estudiante[]>([]); // Store all data for filtering
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
   const [fechaEntrevistaValues, setFechaEntrevistaValues] = useState<Record<string, string>>({});
+  
+  // Filters
+  const [filterEstado, setFilterEstado] = useState<string>("INTERES"); // Default to INTERES
+  const [filterDate, setFilterDate] = useState<string>(""); // Date filter for fecha_interes
 
   const toggleRow = (id: string) => {
     const newExpanded = new Set(expandedRows);
@@ -89,6 +102,33 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
     }
   };
 
+  const applyFilters = (data: Estudiante[], estado: string, date: string) => {
+    let filtered = [...data];
+
+    // Filter by estado
+    if (estado && estado !== "ALL") {
+      filtered = filtered.filter((est) => est.estado === estado);
+    }
+
+    // Filter by date (fecha_interes)
+    if (date) {
+      const filterDateObj = new Date(date);
+      filterDateObj.setHours(0, 0, 0, 0);
+      filtered = filtered.filter((est) => {
+        if (!est.fecha_interes) return false;
+        const estDate = new Date(est.fecha_interes);
+        estDate.setHours(0, 0, 0, 0);
+        return estDate.getTime() === filterDateObj.getTime();
+      });
+    }
+
+    setEstudiantes(filtered);
+  };
+
+  useEffect(() => {
+    applyFilters(allEstudiantes, filterEstado, filterDate);
+  }, [filterEstado, filterDate, allEstudiantes]);
+
   const fetchEstudiantes = async () => {
     try {
       setIsLoading(true);
@@ -103,7 +143,7 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
       }
 
       const estudiantesData = json.data || [];
-      setEstudiantes(estudiantesData);
+      setAllEstudiantes(estudiantesData);
       
       // Initialize fecha_entrevista values for date inputs
       const fechaValues: Record<string, string> = {};
@@ -115,6 +155,9 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
         }
       });
       setFechaEntrevistaValues(fechaValues);
+      
+      // Apply filters
+      applyFilters(estudiantesData, filterEstado, filterDate);
     } catch (err) {
       console.error("Error fetching enrollments:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -148,19 +191,19 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
         throw new Error(json.error?.message || "Failed to update student status");
       }
 
-      // Update local state smoothly without full reload
-      setEstudiantes((prev) =>
-        prev.map((est) =>
-          est.id_postulante === idPostulante
-            ? { ...est, estado: nuevoEstado, fecha_resolucion: fechaResolucionISO }
-            : est
-        )
-      );
+      // Update both filtered and all estudiantes state
+      const updateStudent = (est: Estudiante) =>
+        est.id_postulante === idPostulante
+          ? { ...est, estado: nuevoEstado, fecha_resolucion: fechaResolucionISO }
+          : est;
+
+      setAllEstudiantes((prev) => prev.map(updateStudent));
+      setEstudiantes((prev) => prev.map(updateStudent));
       
       // Close expanded row after update
       setExpandedRows((prev) => {
         const newSet = new Set(prev);
-        const estudiante = estudiantes.find((e) => e.id_postulante === idPostulante);
+        const estudiante = allEstudiantes.find((e) => e.id_postulante === idPostulante);
         if (estudiante) {
           newSet.delete(estudiante._id);
         }
@@ -216,14 +259,14 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
         throw new Error(json.error?.message || "Failed to update interview date");
       }
 
-      // Update local state smoothly without full reload
-      setEstudiantes((prev) =>
-        prev.map((est) =>
-          est.id_postulante === idPostulante
-            ? { ...est, fecha_entrevista: fechaISO }
-            : est
-        )
-      );
+      // Update both filtered and all estudiantes state
+      const updateStudent = (est: Estudiante) =>
+        est.id_postulante === idPostulante
+          ? { ...est, fecha_entrevista: fechaISO }
+          : est;
+
+      setAllEstudiantes((prev) => prev.map(updateStudent));
+      setEstudiantes((prev) => prev.map(updateStudent));
     } catch (err) {
       console.error("Error updating fecha_entrevista:", err);
       alert(err instanceof Error ? err.message : "An error occurred while updating the interview date");
@@ -279,12 +322,62 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
         <CardTitle>Enrollments</CardTitle>
         <CardDescription>
           {estudiantes.length} student{estudiantes.length !== 1 ? "s" : ""} enrolled
+          {allEstudiantes.length !== estudiantes.length && ` (filtered from ${allEstudiantes.length} total)`}
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Filters */}
+        <div className="mb-4 flex flex-wrap gap-4 items-end pb-4 border-b">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Filters:</span>
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <Label htmlFor="filter-estado" className="text-xs text-gray-600 mb-1 block">
+              Estado
+            </Label>
+            <Select value={filterEstado} onValueChange={setFilterEstado}>
+              <SelectTrigger id="filter-estado" className="w-full">
+                <SelectValue placeholder="Select estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Estados</SelectItem>
+                <SelectItem value="INTERES">INTERES</SelectItem>
+                <SelectItem value="ENTREVISTA">ENTREVISTA</SelectItem>
+                <SelectItem value="ACEPTADO">ACEPTADO</SelectItem>
+                <SelectItem value="RECHAZADO">RECHAZADO</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <Label htmlFor="filter-date" className="text-xs text-gray-600 mb-1 block">
+              Fecha de Interés
+            </Label>
+            <Input
+              id="filter-date"
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          {filterDate && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFilterDate("")}
+              className="h-9"
+            >
+              Clear Date
+            </Button>
+          )}
+        </div>
+
         {estudiantes.length === 0 ? (
           <div className="py-8 text-center text-sm text-gray-500">
-            No enrollments found.
+            {allEstudiantes.length === 0
+              ? "No enrollments found."
+              : "No students match the selected filters."}
           </div>
         ) : (
           <div className="max-h-[600px] overflow-y-auto border rounded-md">

@@ -2,7 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2, Filter } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -36,9 +46,14 @@ interface CassandraDataProps {
 
 export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProps) {
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
+  const [allScholarships, setAllScholarships] = useState<Scholarship[]>([]); // Store all data for filtering
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  
+  // Filters
+  const [filterEstado, setFilterEstado] = useState<string>("ALL");
+  const [filterDate, setFilterDate] = useState<string>(""); // Date filter for fecha_aceptacion
 
   const fetchScholarships = async () => {
     try {
@@ -71,7 +86,9 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
         comite_comentarios: row.comite_comentarios || undefined,
       }));
 
-      setScholarships(scholarshipsData);
+      setAllScholarships(scholarshipsData);
+      // Apply filters
+      applyFilters(scholarshipsData, filterEstado, filterDate);
     } catch (err) {
       console.error("Error fetching Cassandra data:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -80,9 +97,36 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
     }
   };
 
+  const applyFilters = (data: Scholarship[], estado: string, date: string) => {
+    let filtered = [...data];
+
+    // Filter by estado (comite_decision)
+    if (estado && estado !== "ALL") {
+      filtered = filtered.filter((sch) => sch.comite_decision === estado);
+    }
+
+    // Filter by date (fecha_aceptacion)
+    if (date) {
+      const filterDateObj = new Date(date);
+      filterDateObj.setHours(0, 0, 0, 0);
+      filtered = filtered.filter((sch) => {
+        if (!sch.fecha_aceptacion) return false;
+        const schDate = new Date(sch.fecha_aceptacion);
+        schDate.setHours(0, 0, 0, 0);
+        return schDate.getTime() === filterDateObj.getTime();
+      });
+    }
+
+    setScholarships(filtered);
+  };
+
   useEffect(() => {
     fetchScholarships();
   }, [institucionSlug, selectedYear, refreshKey]);
+
+  useEffect(() => {
+    applyFilters(allScholarships, filterEstado, filterDate);
+  }, [filterEstado, filterDate, allScholarships]);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
@@ -158,14 +202,62 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
         </div>
       </CardHeader>
       <CardContent>
+        {/* Filters */}
+        <div className="mb-4 flex flex-wrap gap-4 items-end pb-4 border-b">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Filters:</span>
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <Label htmlFor="cassandra-filter-estado" className="text-xs text-gray-600 mb-1 block">
+              Estado
+            </Label>
+            <Select value={filterEstado} onValueChange={setFilterEstado}>
+              <SelectTrigger id="cassandra-filter-estado" className="w-full">
+                <SelectValue placeholder="Select estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Estados</SelectItem>
+                <SelectItem value="ACEPTADO">ACEPTADO</SelectItem>
+                <SelectItem value="RECHAZADO">RECHAZADO</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <Label htmlFor="cassandra-filter-date" className="text-xs text-gray-600 mb-1 block">
+              Fecha de Resolución
+            </Label>
+            <Input
+              id="cassandra-filter-date"
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          {filterDate && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFilterDate("")}
+              className="h-9"
+            >
+              Clear Date
+            </Button>
+          )}
+        </div>
+
         {scholarships.length === 0 ? (
           <div className="py-8 text-center text-sm text-gray-500">
-            No Cassandra data found for {selectedYear}. Students are only stored in Cassandra when they reach ACEPTADO or RECHAZADO status.
+            {allScholarships.length === 0
+              ? `No Cassandra data found for ${selectedYear}. Students are only stored in Cassandra when they reach ACEPTADO or RECHAZADO status.`
+              : "No students match the selected filters."}
           </div>
         ) : (
           <div className="space-y-4">
             <div className="text-sm text-gray-600 mb-4">
               Found {scholarships.length} student{scholarships.length !== 1 ? "s" : ""} in Cassandra for {selectedYear}
+              {allScholarships.length !== scholarships.length && ` (filtered from ${allScholarships.length} total)`}
             </div>
             <div className="border rounded-lg overflow-hidden">
               <Table>
