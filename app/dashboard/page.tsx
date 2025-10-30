@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { getAuthSession } from "@/lib/auth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DashboardClient } from "./dashboard-client";
 
@@ -46,26 +45,6 @@ export default async function DashboardPage() {
         </div>
         <div className="space-y-6">
           <DashboardClient slug={slug} />
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Statistics</CardTitle>
-                <CardDescription>View enrollment statistics and analytics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600">Dashboard content coming soon...</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Settings</CardTitle>
-                <CardDescription>Configure institution settings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600">Dashboard content coming soon...</p>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </div>
