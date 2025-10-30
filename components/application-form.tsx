@@ -1,32 +1,66 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ChevronRight, ChevronLeft, Check, Upload, AlertCircle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  Upload,
+  AlertCircle,
+} from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const STEPS = [
-  { id: 1, title: "Personal Information", description: "Basic details about you" },
-  { id: 2, title: "Academic Information", description: "Your educational background" },
-  { id: 3, title: "Background & Eligibility", description: "Additional information" },
+  {
+    id: 1,
+    title: "Personal Information",
+    description: "Basic details about you",
+  },
+  {
+    id: 2,
+    title: "Academic Information",
+    description: "Your educational background",
+  },
+  {
+    id: 3,
+    title: "Background & Eligibility",
+    description: "Additional information",
+  },
   { id: 4, title: "Statement of Purpose", description: "Tell us your story" },
-  { id: 5, title: "Documents & Review", description: "Upload required documents" },
-]
+  {
+    id: 5,
+    title: "Documents & Review",
+    description: "Upload required documents",
+  },
+];
 
 export function ApplicationForm() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [dniCheckError, setDniCheckError] = useState<string | null>(null)
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [dniCheckError, setDniCheckError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     // Personal Information
@@ -37,6 +71,7 @@ export function ApplicationForm() {
     dateOfBirth: "",
     gender: "",
     dni: "",
+    materia: "",
     address: "",
     city: "",
     state: "",
@@ -67,59 +102,66 @@ export function ApplicationForm() {
     transcript: null,
     recommendationLetter: null,
     additionalDocuments: null,
-  })
+  });
 
   const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const checkDNI = async (dni: string) => {
-    if (!dni || dni.length < 7) return
+    if (!dni || dni.length < 7) return;
 
     try {
-      const institucionSlug = "your-institution-slug"
-      const response = await fetch(`/api/v1/enrollment/check-dni?dni=${dni}&institucion_slug=${institucionSlug}`)
+      const institucionSlug = "your-institution-slug";
+      const response = await fetch(
+        `/api/v1/enrollment/check-dni?dni=${dni}&institucion_slug=${institucionSlug}`
+      );
 
       if (!response.ok) {
-        const data = await response.json()
-        setDniCheckError(data.message || "This DNI is already registered")
+        const data = await response.json();
+        setDniCheckError(data.message || "This DNI is already registered");
       } else {
-        setDniCheckError(null)
+        setDniCheckError(null);
       }
     } catch (error) {
-      console.error("[v0] DNI check error:", error)
+      console.error("[v0] DNI check error:", error);
     }
-  }
+  };
 
   const nextStep = () => {
     if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1)
-      window.scrollTo({ top: 0, behavior: "smooth" })
+      setCurrentStep(currentStep + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }
+  };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
-      window.scrollTo({ top: 0, behavior: "smooth" })
+      setCurrentStep(currentStep - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitError(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
-      const institucionSlug = "your-institution-slug"
+      const institucionSlug = "your-institution-slug";
 
-      const idPostulante = `EST${Date.now()}`
+      const idPostulante = `EST${Date.now()}`;
 
       const apiPayload = {
         id_postulante: idPostulante,
         nombre: formData.firstName,
         apellido: formData.lastName,
-        sexo: formData.gender === "male" ? "masculino" : formData.gender === "female" ? "femenino" : "otro",
+        sexo:
+          formData.gender === "male"
+            ? "masculino"
+            : formData.gender === "female"
+            ? "femenino"
+            : "otro",
         dni: formData.dni,
         mail: formData.email,
         departamento_interes: formData.currentInstitution,
@@ -130,11 +172,13 @@ export function ApplicationForm() {
         institucion_slug: institucionSlug,
         documentos: {
           dni_img: formData.transcript ? "transcript.pdf" : undefined,
-          analitico_img: formData.recommendationLetter ? "recommendation.pdf" : undefined,
+          analitico_img: formData.recommendationLetter
+            ? "recommendation.pdf"
+            : undefined,
         },
-      }
+      };
 
-      console.log("[v0] Submitting application:", apiPayload)
+      console.log("[v0] Submitting application:", apiPayload);
 
       const response = await fetch("/api/v1/enrollment/submit", {
         method: "POST",
@@ -142,26 +186,32 @@ export function ApplicationForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(apiPayload),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to submit application")
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit application");
       }
 
-      const result = await response.json()
-      console.log("[v0] Application submitted successfully:", result)
+      const result = await response.json();
+      console.log("[v0] Application submitted successfully:", result);
 
-      alert("Application submitted successfully! You will receive a confirmation email shortly.")
+      alert(
+        "Application submitted successfully! You will receive a confirmation email shortly."
+      );
 
       // window.location.href = "/application-success"
     } catch (error) {
-      console.error("[v0] Submission error:", error)
-      setSubmitError(error instanceof Error ? error.message : "Failed to submit application. Please try again.")
+      console.error("[v0] Submission error:", error);
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Failed to submit application. Please try again."
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-8">
@@ -176,17 +226,25 @@ export function ApplicationForm() {
                     currentStep > step.id
                       ? "border-primary bg-primary text-primary-foreground"
                       : currentStep === step.id
-                        ? "border-primary bg-background text-primary"
-                        : "border-muted bg-background text-muted-foreground"
+                      ? "border-primary bg-background text-primary"
+                      : "border-muted bg-background text-muted-foreground"
                   }`}
                 >
-                  {currentStep > step.id ? <Check className="h-5 w-5" /> : step.id}
+                  {currentStep > step.id ? (
+                    <Check className="h-5 w-5" />
+                  ) : (
+                    step.id
+                  )}
                 </div>
-                <span className="hidden text-xs font-medium md:block">{step.title}</span>
+                <span className="hidden text-xs font-medium md:block">
+                  {step.title}
+                </span>
               </div>
               {index < STEPS.length - 1 && (
                 <div
-                  className={`mx-2 h-0.5 flex-1 transition-colors ${currentStep > step.id ? "bg-primary" : "bg-muted"}`}
+                  className={`mx-2 h-0.5 flex-1 transition-colors ${
+                    currentStep > step.id ? "bg-primary" : "bg-muted"
+                  }`}
                 />
               )}
             </div>
@@ -205,42 +263,17 @@ export function ApplicationForm() {
         <Card>
           <CardHeader>
             <CardTitle>{STEPS[currentStep - 1].title}</CardTitle>
-            <CardDescription>{STEPS[currentStep - 1].description}</CardDescription>
+            <CardDescription>
+              {STEPS[currentStep - 1].description}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Step 1: Personal Information */}
+            {/* Step 1: DNI + Materia */}
             {currentStep === 1 && (
               <div className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">
-                      First Name <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="firstName"
-                      required
-                      value={formData.firstName}
-                      onChange={(e) => updateFormData("firstName", e.target.value)}
-                      placeholder="John"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">
-                      Last Name <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="lastName"
-                      required
-                      value={formData.lastName}
-                      onChange={(e) => updateFormData("lastName", e.target.value)}
-                      placeholder="Doe"
-                    />
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="dni">
-                    DNI / National ID <span className="text-destructive">*</span>
+                    Ingrese su DNI <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="dni"
@@ -250,138 +283,30 @@ export function ApplicationForm() {
                     onBlur={(e) => checkDNI(e.target.value)}
                     placeholder="12345678"
                     pattern="[0-9]+"
-                    title="Please enter only numbers"
+                    title="Ingrese solo números"
                   />
-                  {dniCheckError && <p className="text-sm text-destructive">{dniCheckError}</p>}
-                  <p className="text-xs text-muted-foreground">Enter your national identification number</p>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">
-                      Email Address <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => updateFormData("email", e.target.value)}
-                      placeholder="john.doe@example.com"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">
-                      Phone Number <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => updateFormData("phone", e.target.value)}
-                      placeholder="+1 (555) 123-4567"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="dateOfBirth">
-                      Date of Birth <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="dateOfBirth"
-                      type="date"
-                      required
-                      value={formData.dateOfBirth}
-                      onChange={(e) => updateFormData("dateOfBirth", e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="gender">
-                      Gender <span className="text-destructive">*</span>
-                    </Label>
-                    <Select value={formData.gender} onValueChange={(value) => updateFormData("gender", value)} required>
-                      <SelectTrigger id="gender">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="non-binary">Non-binary</SelectItem>
-                        <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {dniCheckError && (
+                    <p className="text-sm text-destructive">{dniCheckError}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address">
-                    Street Address <span className="text-destructive">*</span>
+                  <Label htmlFor="materia">
+                    Materia <span className="text-destructive">*</span>
                   </Label>
-                  <Input
-                    id="address"
-                    required
-                    value={formData.address}
-                    onChange={(e) => updateFormData("address", e.target.value)}
-                    placeholder="123 Main Street, Apt 4B"
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">
-                      City <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="city"
-                      required
-                      value={formData.city}
-                      onChange={(e) => updateFormData("city", e.target.value)}
-                      placeholder="New York"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="state">
-                      State/Province <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="state"
-                      required
-                      value={formData.state}
-                      onChange={(e) => updateFormData("state", e.target.value)}
-                      placeholder="NY"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="zipCode">
-                      ZIP/Postal Code <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="zipCode"
-                      required
-                      value={formData.zipCode}
-                      onChange={(e) => updateFormData("zipCode", e.target.value)}
-                      placeholder="10001"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="country">
-                    Country <span className="text-destructive">*</span>
-                  </Label>
-                  <Select value={formData.country} onValueChange={(value) => updateFormData("country", value)}>
-                    <SelectTrigger id="country">
-                      <SelectValue placeholder="Select country" />
+                  <Select
+                    value={formData.materia}
+                    onValueChange={(value) => updateFormData("materia", value)}
+                  >
+                    <SelectTrigger id="materia">
+                      <SelectValue placeholder="Seleccione una materia" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="us">United States</SelectItem>
-                      <SelectItem value="ca">Canada</SelectItem>
-                      <SelectItem value="uk">United Kingdom</SelectItem>
-                      <SelectItem value="au">Australia</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="matematica">Matemática</SelectItem>
+                      <SelectItem value="programacion">Programación</SelectItem>
+                      <SelectItem value="base-de-datos">
+                        Base de Datos
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -393,49 +318,70 @@ export function ApplicationForm() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="currentInstitution">
-                    Current Institution <span className="text-destructive">*</span>
+                    Current Institution{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="currentInstitution"
                     required
                     value={formData.currentInstitution}
-                    onChange={(e) => updateFormData("currentInstitution", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("currentInstitution", e.target.value)
+                    }
                     placeholder="University of Example"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="currentLevel">
-                    Current Academic Level <span className="text-destructive">*</span>
+                    Current Academic Level{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Select
                     value={formData.currentLevel}
-                    onValueChange={(value) => updateFormData("currentLevel", value)}
+                    onValueChange={(value) =>
+                      updateFormData("currentLevel", value)
+                    }
                   >
                     <SelectTrigger id="currentLevel">
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="high-school">High School</SelectItem>
-                      <SelectItem value="undergraduate-freshman">Undergraduate - Freshman</SelectItem>
-                      <SelectItem value="undergraduate-sophomore">Undergraduate - Sophomore</SelectItem>
-                      <SelectItem value="undergraduate-junior">Undergraduate - Junior</SelectItem>
-                      <SelectItem value="undergraduate-senior">Undergraduate - Senior</SelectItem>
-                      <SelectItem value="graduate-masters">Graduate - Master's</SelectItem>
-                      <SelectItem value="graduate-phd">Graduate - PhD</SelectItem>
+                      <SelectItem value="undergraduate-freshman">
+                        Undergraduate - Freshman
+                      </SelectItem>
+                      <SelectItem value="undergraduate-sophomore">
+                        Undergraduate - Sophomore
+                      </SelectItem>
+                      <SelectItem value="undergraduate-junior">
+                        Undergraduate - Junior
+                      </SelectItem>
+                      <SelectItem value="undergraduate-senior">
+                        Undergraduate - Senior
+                      </SelectItem>
+                      <SelectItem value="graduate-masters">
+                        Graduate - Master's
+                      </SelectItem>
+                      <SelectItem value="graduate-phd">
+                        Graduate - PhD
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="fieldOfStudy">
-                    Current Field of Study <span className="text-destructive">*</span>
+                    Current Field of Study{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="fieldOfStudy"
                     required
                     value={formData.fieldOfStudy}
-                    onChange={(e) => updateFormData("fieldOfStudy", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("fieldOfStudy", e.target.value)
+                    }
                     placeholder="Computer Science"
                   />
                 </div>
@@ -456,31 +402,39 @@ export function ApplicationForm() {
                       onChange={(e) => updateFormData("gpa", e.target.value)}
                       placeholder="3.75"
                     />
-                    <p className="text-xs text-muted-foreground">On a 4.0 scale</p>
+                    <p className="text-xs text-muted-foreground">
+                      On a 4.0 scale
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="expectedGraduation">
-                      Expected Graduation Date <span className="text-destructive">*</span>
+                      Expected Graduation Date{" "}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="expectedGraduation"
                       type="month"
                       required
                       value={formData.expectedGraduation}
-                      onChange={(e) => updateFormData("expectedGraduation", e.target.value)}
+                      onChange={(e) =>
+                        updateFormData("expectedGraduation", e.target.value)
+                      }
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="intendedMajor">
-                    Intended Major/Program <span className="text-destructive">*</span>
+                    Intended Major/Program{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="intendedMajor"
                     required
                     value={formData.intendedMajor}
-                    onChange={(e) => updateFormData("intendedMajor", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("intendedMajor", e.target.value)
+                    }
                     placeholder="Software Engineering"
                   />
                   <p className="text-xs text-muted-foreground">
@@ -491,7 +445,8 @@ export function ApplicationForm() {
                 <div className="rounded-lg border border-border bg-muted/50 p-4">
                   <h3 className="mb-2 font-medium">Academic Achievements</h3>
                   <p className="text-sm text-muted-foreground">
-                    Please list any academic honors, awards, or achievements (optional)
+                    Please list any academic honors, awards, or achievements
+                    (optional)
                   </p>
                   <Textarea
                     className="mt-3"
@@ -507,16 +462,26 @@ export function ApplicationForm() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="citizenship">
-                    Citizenship Status <span className="text-destructive">*</span>
+                    Citizenship Status{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
-                  <Select value={formData.citizenship} onValueChange={(value) => updateFormData("citizenship", value)}>
+                  <Select
+                    value={formData.citizenship}
+                    onValueChange={(value) =>
+                      updateFormData("citizenship", value)
+                    }
+                  >
                     <SelectTrigger id="citizenship">
                       <SelectValue placeholder="Select citizenship status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="citizen">Citizen</SelectItem>
-                      <SelectItem value="permanent-resident">Permanent Resident</SelectItem>
-                      <SelectItem value="international">International Student</SelectItem>
+                      <SelectItem value="permanent-resident">
+                        Permanent Resident
+                      </SelectItem>
+                      <SelectItem value="international">
+                        International Student
+                      </SelectItem>
                       <SelectItem value="refugee">Refugee/Asylee</SelectItem>
                     </SelectContent>
                   </Select>
@@ -524,30 +489,42 @@ export function ApplicationForm() {
 
                 <div className="space-y-2">
                   <Label htmlFor="residencyStatus">
-                    State Residency Status <span className="text-destructive">*</span>
+                    State Residency Status{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Select
                     value={formData.residencyStatus}
-                    onValueChange={(value) => updateFormData("residencyStatus", value)}
+                    onValueChange={(value) =>
+                      updateFormData("residencyStatus", value)
+                    }
                   >
                     <SelectTrigger id="residencyStatus">
                       <SelectValue placeholder="Select residency status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="in-state">In-State Resident</SelectItem>
-                      <SelectItem value="out-of-state">Out-of-State Resident</SelectItem>
-                      <SelectItem value="international">International</SelectItem>
+                      <SelectItem value="in-state">
+                        In-State Resident
+                      </SelectItem>
+                      <SelectItem value="out-of-state">
+                        Out-of-State Resident
+                      </SelectItem>
+                      <SelectItem value="international">
+                        International
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-3">
                   <Label>
-                    First-Generation College Student <span className="text-destructive">*</span>
+                    First-Generation College Student{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <RadioGroup
                     value={formData.firstGeneration}
-                    onValueChange={(value) => updateFormData("firstGeneration", value)}
+                    onValueChange={(value) =>
+                      updateFormData("firstGeneration", value)
+                    }
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="yes" id="first-gen-yes" />
@@ -566,34 +543,50 @@ export function ApplicationForm() {
 
                 <div className="space-y-2">
                   <Label htmlFor="householdIncome">
-                    Annual Household Income <span className="text-destructive">*</span>
+                    Annual Household Income{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Select
                     value={formData.householdIncome}
-                    onValueChange={(value) => updateFormData("householdIncome", value)}
+                    onValueChange={(value) =>
+                      updateFormData("householdIncome", value)
+                    }
                   >
                     <SelectTrigger id="householdIncome">
                       <SelectValue placeholder="Select income range" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="0-25000">$0 - $25,000</SelectItem>
-                      <SelectItem value="25001-50000">$25,001 - $50,000</SelectItem>
-                      <SelectItem value="50001-75000">$50,001 - $75,000</SelectItem>
-                      <SelectItem value="75001-100000">$75,001 - $100,000</SelectItem>
-                      <SelectItem value="100001-150000">$100,001 - $150,000</SelectItem>
+                      <SelectItem value="25001-50000">
+                        $25,001 - $50,000
+                      </SelectItem>
+                      <SelectItem value="50001-75000">
+                        $50,001 - $75,000
+                      </SelectItem>
+                      <SelectItem value="75001-100000">
+                        $75,001 - $100,000
+                      </SelectItem>
+                      <SelectItem value="100001-150000">
+                        $100,001 - $150,000
+                      </SelectItem>
                       <SelectItem value="150001+">$150,001+</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">This information is used for need-based scholarships</p>
+                  <p className="text-xs text-muted-foreground">
+                    This information is used for need-based scholarships
+                  </p>
                 </div>
 
                 <div className="space-y-3">
                   <Label>
-                    Are you currently receiving financial aid? <span className="text-destructive">*</span>
+                    Are you currently receiving financial aid?{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <RadioGroup
                     value={formData.financialAidReceived}
-                    onValueChange={(value) => updateFormData("financialAidReceived", value)}
+                    onValueChange={(value) =>
+                      updateFormData("financialAidReceived", value)
+                    }
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="yes" id="aid-yes" />
@@ -613,7 +606,8 @@ export function ApplicationForm() {
                 <div className="rounded-lg border border-border bg-muted/50 p-4">
                   <h3 className="mb-2 font-medium">Special Circumstances</h3>
                   <p className="text-sm text-muted-foreground">
-                    Please describe any special circumstances that may affect your financial need (optional)
+                    Please describe any special circumstances that may affect
+                    your financial need (optional)
                   </p>
                   <Textarea
                     className="mt-3"
@@ -629,50 +623,65 @@ export function ApplicationForm() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="statementOfPurpose">
-                    Statement of Purpose <span className="text-destructive">*</span>
+                    Statement of Purpose{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Textarea
                     id="statementOfPurpose"
                     required
                     value={formData.statementOfPurpose}
-                    onChange={(e) => updateFormData("statementOfPurpose", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("statementOfPurpose", e.target.value)
+                    }
                     placeholder="Tell us about your academic journey, achievements, and what drives your passion for learning..."
                     rows={8}
                     className="resize-none"
                   />
-                  <p className="text-xs text-muted-foreground">Minimum 250 words, maximum 500 words</p>
+                  <p className="text-xs text-muted-foreground">
+                    Minimum 250 words, maximum 500 words
+                  </p>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="careerGoals">
-                    Career Goals and Aspirations <span className="text-destructive">*</span>
+                    Career Goals and Aspirations{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Textarea
                     id="careerGoals"
                     required
                     value={formData.careerGoals}
-                    onChange={(e) => updateFormData("careerGoals", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("careerGoals", e.target.value)
+                    }
                     placeholder="Describe your career goals and how this scholarship will help you achieve them..."
                     rows={6}
                     className="resize-none"
                   />
-                  <p className="text-xs text-muted-foreground">Minimum 150 words, maximum 300 words</p>
+                  <p className="text-xs text-muted-foreground">
+                    Minimum 150 words, maximum 300 words
+                  </p>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="whyScholarship">
-                    Why Do You Need This Scholarship? <span className="text-destructive">*</span>
+                    Why Do You Need This Scholarship?{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Textarea
                     id="whyScholarship"
                     required
                     value={formData.whyScholarship}
-                    onChange={(e) => updateFormData("whyScholarship", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("whyScholarship", e.target.value)
+                    }
                     placeholder="Explain how this scholarship will impact your education and future..."
                     rows={6}
                     className="resize-none"
                   />
-                  <p className="text-xs text-muted-foreground">Minimum 150 words, maximum 300 words</p>
+                  <p className="text-xs text-muted-foreground">
+                    Minimum 150 words, maximum 300 words
+                  </p>
                 </div>
 
                 <div className="rounded-lg border border-border bg-accent/50 p-4">
@@ -693,63 +702,84 @@ export function ApplicationForm() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="transcript">
-                      Official Transcript <span className="text-destructive">*</span>
+                      Official Transcript{" "}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <div className="flex items-center gap-3">
                       <Input
                         id="transcript"
                         type="file"
                         accept=".pdf,.doc,.docx"
-                        onChange={(e) => updateFormData("transcript", e.target.files?.[0])}
+                        onChange={(e) =>
+                          updateFormData("transcript", e.target.files?.[0])
+                        }
                         className="flex-1"
                       />
                       <Button type="button" variant="outline" size="icon">
                         <Upload className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">PDF or Word document, max 10MB</p>
+                    <p className="text-xs text-muted-foreground">
+                      PDF or Word document, max 10MB
+                    </p>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="recommendationLetter">
-                      Letter of Recommendation <span className="text-destructive">*</span>
+                      Letter of Recommendation{" "}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <div className="flex items-center gap-3">
                       <Input
                         id="recommendationLetter"
                         type="file"
                         accept=".pdf,.doc,.docx"
-                        onChange={(e) => updateFormData("recommendationLetter", e.target.files?.[0])}
+                        onChange={(e) =>
+                          updateFormData(
+                            "recommendationLetter",
+                            e.target.files?.[0]
+                          )
+                        }
                         className="flex-1"
                       />
                       <Button type="button" variant="outline" size="icon">
                         <Upload className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">From a teacher, counselor, or mentor</p>
+                    <p className="text-xs text-muted-foreground">
+                      From a teacher, counselor, or mentor
+                    </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="additionalDocuments">Additional Documents (Optional)</Label>
+                    <Label htmlFor="additionalDocuments">
+                      Additional Documents (Optional)
+                    </Label>
                     <div className="flex items-center gap-3">
                       <Input
                         id="additionalDocuments"
                         type="file"
                         accept=".pdf,.doc,.docx"
                         multiple
-                        onChange={(e) => updateFormData("additionalDocuments", e.target.files)}
+                        onChange={(e) =>
+                          updateFormData("additionalDocuments", e.target.files)
+                        }
                         className="flex-1"
                       />
                       <Button type="button" variant="outline" size="icon">
                         <Upload className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">Awards, certificates, or other supporting documents</p>
+                    <p className="text-xs text-muted-foreground">
+                      Awards, certificates, or other supporting documents
+                    </p>
                   </div>
                 </div>
 
                 <div className="rounded-lg border border-border bg-muted/50 p-6">
-                  <h3 className="mb-4 text-lg font-semibold">Application Summary</h3>
+                  <h3 className="mb-4 text-lg font-semibold">
+                    Application Summary
+                  </h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Name:</span>
@@ -762,16 +792,24 @@ export function ApplicationForm() {
                       <span className="font-medium">{formData.email}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Institution:</span>
-                      <span className="font-medium">{formData.currentInstitution}</span>
+                      <span className="text-muted-foreground">
+                        Institution:
+                      </span>
+                      <span className="font-medium">
+                        {formData.currentInstitution}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">GPA:</span>
                       <span className="font-medium">{formData.gpa}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Intended Major:</span>
-                      <span className="font-medium">{formData.intendedMajor}</span>
+                      <span className="text-muted-foreground">
+                        Intended Major:
+                      </span>
+                      <span className="font-medium">
+                        {formData.intendedMajor}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -783,12 +821,13 @@ export function ApplicationForm() {
                       htmlFor="terms"
                       className="text-sm font-medium leading-relaxed peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      I certify that all information provided is accurate and complete{" "}
-                      <span className="text-destructive">*</span>
+                      I certify that all information provided is accurate and
+                      complete <span className="text-destructive">*</span>
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      By submitting this application, you agree to our terms and conditions and acknowledge that false
-                      information may result in disqualification.
+                      By submitting this application, you agree to our terms and
+                      conditions and acknowledge that false information may
+                      result in disqualification.
                     </p>
                   </div>
                 </div>
@@ -799,23 +838,32 @@ export function ApplicationForm() {
 
         {/* Navigation Buttons */}
         <div className="mt-6 flex items-center justify-between">
-          <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1 || isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={prevStep}
+            disabled={currentStep === 1 || isSubmitting}
+          >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Previous
           </Button>
 
           {currentStep < STEPS.length ? (
             <Button type="button" onClick={nextStep} disabled={isSubmitting}>
-              Next
+              {currentStep === 1 ? "Aplicar" : "Next"}
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button type="submit" className="font-medium" disabled={isSubmitting || !!dniCheckError}>
+            <Button
+              type="submit"
+              className="font-medium"
+              disabled={isSubmitting || !!dniCheckError}
+            >
               {isSubmitting ? "Submitting..." : "Submit Application"}
             </Button>
           )}
         </div>
       </form>
     </div>
-  )
+  );
 }
