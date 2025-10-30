@@ -22,6 +22,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   ChevronRight,
@@ -61,6 +74,8 @@ export function ApplicationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [dniCheckError, setDniCheckError] = useState<string | null>(null);
+  const [stepError, setStepError] = useState<string | null>(null);
+  const [materiaOpen, setMateriaOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     // Personal Information
@@ -129,6 +144,26 @@ export function ApplicationForm() {
   };
 
   const nextStep = () => {
+    setStepError(null);
+
+    if (currentStep === 1) {
+      const dniIsValid = /^\d{7,}$/.test(formData.dni.trim());
+      if (!dniIsValid) {
+        setStepError(
+          "Por favor ingrese un DNI válido (solo números, mínimo 7 dígitos)."
+        );
+        return;
+      }
+      if (dniCheckError) {
+        setStepError("El DNI ingresado ya está registrado. Utilice otro.");
+        return;
+      }
+      if (!formData.materia) {
+        setStepError("Seleccione una materia para continuar.");
+        return;
+      }
+    }
+
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -252,10 +287,10 @@ export function ApplicationForm() {
         </div>
       </div>
 
-      {submitError && (
+      {(submitError || stepError) && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{submitError}</AlertDescription>
+          <AlertDescription>{stepError ?? submitError}</AlertDescription>
         </Alert>
       )}
 
@@ -294,21 +329,66 @@ export function ApplicationForm() {
                   <Label htmlFor="materia">
                     Materia <span className="text-destructive">*</span>
                   </Label>
-                  <Select
-                    value={formData.materia}
-                    onValueChange={(value) => updateFormData("materia", value)}
-                  >
-                    <SelectTrigger id="materia">
-                      <SelectValue placeholder="Seleccione una materia" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="matematica">Matemática</SelectItem>
-                      <SelectItem value="programacion">Programación</SelectItem>
-                      <SelectItem value="base-de-datos">
-                        Base de Datos
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Popover open={materiaOpen} onOpenChange={setMateriaOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="materia"
+                        type="button"
+                        variant="outline"
+                        className="justify-between"
+                      >
+                        {formData.materia
+                          ? formData.materia === "matematica"
+                            ? "Matemática"
+                            : formData.materia === "programacion"
+                            ? "Programación"
+                            : formData.materia === "base-de-datos"
+                            ? "Base de Datos"
+                            : formData.materia
+                          : "Seleccione una materia"}
+                        <ChevronRight className="ml-2 h-4 w-4 rotate-90 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Buscar materia..." />
+                        <CommandList>
+                          <CommandEmpty>
+                            No se encontraron materias.
+                          </CommandEmpty>
+                          <CommandGroup>
+                            <CommandItem
+                              onSelect={() => {
+                                updateFormData("materia", "matematica");
+                                setMateriaOpen(false);
+                              }}
+                              value="matematica"
+                            >
+                              Matemática
+                            </CommandItem>
+                            <CommandItem
+                              onSelect={() => {
+                                updateFormData("materia", "programacion");
+                                setMateriaOpen(false);
+                              }}
+                              value="programacion"
+                            >
+                              Programación
+                            </CommandItem>
+                            <CommandItem
+                              onSelect={() => {
+                                updateFormData("materia", "base-de-datos");
+                                setMateriaOpen(false);
+                              }}
+                              value="base-de-datos"
+                            >
+                              Base de Datos
+                            </CommandItem>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             )}
