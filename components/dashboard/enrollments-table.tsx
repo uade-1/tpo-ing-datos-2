@@ -40,6 +40,14 @@ const estadoColors: Record<string, string> = {
   RECHAZADO: "bg-red-100 text-red-800",
 };
 
+// Calculate min date as tomorrow to only allow future dates (not today or past)
+const getMinDate = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + 1); // Tomorrow
+  return date.toISOString().split('T')[0];
+};
+const MIN_DATE = getMinDate();
+
 export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -359,6 +367,7 @@ export function EnrollmentsTable({ institucionSlug }: EnrollmentsTableProps) {
                                     }}
                                     className="max-w-xs"
                                     disabled={updatingIds.has(estudiante.id_postulante)}
+                                    min={MIN_DATE}
                                   />
                                   <Button
                                     size="sm"
