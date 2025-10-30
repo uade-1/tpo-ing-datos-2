@@ -216,9 +216,7 @@ export const submitEnrollment = async (
         dni,
         carrera_interes,
         enrollmentData.estado,
-        enrollmentData.fecha_resolucion
-          ? new Date(enrollmentData.fecha_resolucion)
-          : undefined,
+        new Date(enrollmentData.fecha_interes),
         enrollmentData.fecha_entrevista
           ? new Date(enrollmentData.fecha_entrevista)
           : undefined
