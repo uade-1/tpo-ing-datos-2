@@ -522,142 +522,71 @@ export function ApplicationForm() {
             {/* Step 2: Academic Information */}
             {currentStep === 2 && (
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="currentInstitution">
-                    Current Institution{" "}
-                    <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="currentInstitution"
-                    required
-                    value={formData.currentInstitution}
-                    onChange={(e) =>
-                      updateFormData("currentInstitution", e.target.value)
-                    }
-                    placeholder="University of Example"
-                  />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">
+                      First Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="firstName"
+                      required
+                      value={formData.firstName}
+                      onChange={(e) =>
+                        updateFormData("firstName", e.target.value)
+                      }
+                      placeholder="John"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">
+                      Last Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="lastName"
+                      required
+                      value={formData.lastName}
+                      onChange={(e) =>
+                        updateFormData("lastName", e.target.value)
+                      }
+                      placeholder="Doe"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="currentLevel">
-                    Current Academic Level{" "}
-                    <span className="text-destructive">*</span>
+                  <Label htmlFor="gender">
+                    Gender <span className="text-destructive">*</span>
                   </Label>
                   <Select
-                    value={formData.currentLevel}
-                    onValueChange={(value) =>
-                      updateFormData("currentLevel", value)
-                    }
+                    value={formData.gender}
+                    onValueChange={(value) => updateFormData("gender", value)}
+                    required
                   >
-                    <SelectTrigger id="currentLevel">
-                      <SelectValue placeholder="Select level" />
+                    <SelectTrigger id="gender">
+                      <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="high-school">High School</SelectItem>
-                      <SelectItem value="undergraduate-freshman">
-                        Undergraduate - Freshman
-                      </SelectItem>
-                      <SelectItem value="undergraduate-sophomore">
-                        Undergraduate - Sophomore
-                      </SelectItem>
-                      <SelectItem value="undergraduate-junior">
-                        Undergraduate - Junior
-                      </SelectItem>
-                      <SelectItem value="undergraduate-senior">
-                        Undergraduate - Senior
-                      </SelectItem>
-                      <SelectItem value="graduate-masters">
-                        Graduate - Master's
-                      </SelectItem>
-                      <SelectItem value="graduate-phd">
-                        Graduate - PhD
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="non-binary">Non-binary</SelectItem>
+                      <SelectItem value="prefer-not-to-say">
+                        Prefer not to say
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="fieldOfStudy">
-                    Current Field of Study{" "}
-                    <span className="text-destructive">*</span>
+                  <Label htmlFor="email">
+                    Email Address <span className="text-destructive">*</span>
                   </Label>
                   <Input
-                    id="fieldOfStudy"
+                    id="email"
+                    type="email"
                     required
-                    value={formData.fieldOfStudy}
-                    onChange={(e) =>
-                      updateFormData("fieldOfStudy", e.target.value)
-                    }
-                    placeholder="Computer Science"
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="gpa">
-                      Current GPA <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="gpa"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="4"
-                      required
-                      value={formData.gpa}
-                      onChange={(e) => updateFormData("gpa", e.target.value)}
-                      placeholder="3.75"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      On a 4.0 scale
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="expectedGraduation">
-                      Expected Graduation Date{" "}
-                      <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="expectedGraduation"
-                      type="month"
-                      required
-                      value={formData.expectedGraduation}
-                      onChange={(e) =>
-                        updateFormData("expectedGraduation", e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="intendedMajor">
-                    Intended Major/Program{" "}
-                    <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="intendedMajor"
-                    required
-                    value={formData.intendedMajor}
-                    onChange={(e) =>
-                      updateFormData("intendedMajor", e.target.value)
-                    }
-                    placeholder="Software Engineering"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    If applying for scholarship, what program will you pursue?
-                  </p>
-                </div>
-
-                <div className="rounded-lg border border-border bg-muted/50 p-4">
-                  <h3 className="mb-2 font-medium">Academic Achievements</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Please list any academic honors, awards, or achievements
-                    (optional)
-                  </p>
-                  <Textarea
-                    className="mt-3"
-                    placeholder="Dean's List, Honor Society memberships, academic competitions, etc."
-                    rows={3}
+                    value={formData.email}
+                    onChange={(e) => updateFormData("email", e.target.value)}
+                    placeholder="john.doe@example.com"
                   />
                 </div>
               </div>
