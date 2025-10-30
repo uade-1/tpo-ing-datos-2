@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { EnrollmentsTable } from "@/components/dashboard/enrollments-table";
 import { GraphVisualization } from "@/components/dashboard/graph-visualization";
+import { CassandraData } from "@/components/dashboard/cassandra-data";
 
 function extractSlugFromHost(host: string | null): string {
   if (!host) return "uade";
@@ -48,6 +49,7 @@ export default async function DashboardPage() {
         <div className="space-y-6">
           <EnrollmentsTable institucionSlug={slug} />
           <GraphVisualization institucionSlug={slug} />
+          <CassandraData institucionSlug={slug} />
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>

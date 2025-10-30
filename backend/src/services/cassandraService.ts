@@ -7,7 +7,11 @@ export class CassandraScholarshipService {
   }
 
   async registerScholarship(estudiante: Estudiante): Promise<void> {
-    const año = new Date(estudiante.fecha_inscripcion).getFullYear();
+    // Use fecha_resolucion if available (when accepted/rejected), otherwise fecha_interes
+    const fechaResolucion = estudiante.fecha_resolucion 
+      ? new Date(estudiante.fecha_resolucion)
+      : new Date(estudiante.fecha_interes);
+    const año = fechaResolucion.getFullYear();
 
     // Fallback to a literal CQL string to avoid codec issues during testing
     const esc = (s: any) =>
@@ -16,6 +20,12 @@ export class CassandraScholarshipService {
     // Format timestamp as ISO8601 string for Cassandra
     const ts = (d: any) =>
       d ? `'${new Date(d).toISOString()}'` : "NULL";
+
+    // Extract comite fields - use estado as comite_decision if comite.decision is not available
+    const comiteDecision = estudiante.comite?.decision || estudiante.estado || null;
+    const comiteId = estudiante.comite?.comite_id || null;
+    const comiteComentarios = estudiante.comite?.comentarios || null;
+    const comiteFechaRevision = estudiante.comite?.fecha_revision || null;
 
     const insertCql = `INSERT INTO estudiantes_becados (
         institucion_slug, anio, dni, id_postulante, nombre, apellido, sexo,
@@ -33,15 +43,15 @@ export class CassandraScholarshipService {
         ${esc(estudiante.mail)},
         ${esc(estudiante.carrera_interes)},
         ${esc(estudiante.departamento_interes)},
-        ${ts(estudiante.fecha_inscripcion)},
+        ${ts(fechaResolucion)},
         ${ts(estudiante.fecha_interes)},
         ${estudiante.fecha_entrevista ? ts(estudiante.fecha_entrevista) : "NULL"},
-        ${ts(new Date())},
+        ${ts(fechaResolucion)},
         NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        ${esc(comiteId)},
+        ${esc(comiteDecision)},
+        ${esc(comiteComentarios)},
+        ${comiteFechaRevision ? ts(comiteFechaRevision) : "NULL"}
       )`;
 
     await this.client.execute(insertCql);
@@ -64,6 +74,8 @@ export class CassandraScholarshipService {
       setClauses.push("documentos = ?");
       params.push(updates.documentos);
     }
+    
+    // Update comite fields - prioritize comite.decision, fallback to estado
     if (updates.comite) {
       if (updates.comite.comite_id) {
         setClauses.push("comite_id = ?");
@@ -81,6 +93,12 @@ export class CassandraScholarshipService {
         setClauses.push("comite_fecha_revision = ?");
         params.push(new Date(updates.comite.fecha_revision));
       }
+    }
+    
+    // If estado is provided and comite_decision hasn't been set yet, use estado
+    if (updates.estado && !setClauses.some(clause => clause.includes("comite_decision"))) {
+      setClauses.push("comite_decision = ?");
+      params.push(updates.estado);
     }
 
     if (setClauses.length === 0) return;

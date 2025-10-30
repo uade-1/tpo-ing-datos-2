@@ -168,10 +168,10 @@ export const updateEstudiante = async (
       }
     }
 
-    // Si el estado cambió a ACEPTADO, registrar en Cassandra
+    // Si el estado cambió a ACEPTADO o RECHAZADO, registrar en Cassandra
     if (
-      updateData.estado === "ACEPTADO" &&
-      existingEstudiante.estado !== "ACEPTADO"
+      (updateData.estado === "ACEPTADO" || updateData.estado === "RECHAZADO") &&
+      existingEstudiante.estado !== updateData.estado
     ) {
       try {
         const estudiantePlain = (estudiante as any).toObject
@@ -179,7 +179,7 @@ export const updateEstudiante = async (
           : (estudiante as any);
         await cassandraService.registerScholarship(estudiantePlain as any);
         console.log(
-          `Estudiante ${estudiante.dni} registrado en Cassandra como becado`
+          `Estudiante ${estudiante.dni} registrado en Cassandra con estado ${updateData.estado}`
         );
       } catch (cassandraError) {
         console.error("Error registrando en Cassandra:", cassandraError);
@@ -187,10 +187,11 @@ export const updateEstudiante = async (
       }
     }
 
-    // Si ya estaba ACEPTADO y se actualizó, sincronizar cambios
+    // Si ya estaba ACEPTADO o RECHAZADO y se actualizó, sincronizar cambios
     if (
-      updateData.estado === "ACEPTADO" &&
-      existingEstudiante.estado === "ACEPTADO"
+      (updateData.estado === "ACEPTADO" || updateData.estado === "RECHAZADO") &&
+      (existingEstudiante.estado === "ACEPTADO" || existingEstudiante.estado === "RECHAZADO") &&
+      existingEstudiante.estado === updateData.estado
     ) {
       try {
         const año = estudiante.fecha_resolucion
@@ -203,10 +204,11 @@ export const updateEstudiante = async (
           updateData as any
         );
         console.log(
-          `Datos de becado actualizados en Cassandra para ${estudiante.dni}`
+          `Datos actualizados en Cassandra para ${estudiante.dni}`
         );
       } catch (cassandraError) {
         console.error("Error actualizando Cassandra:", cassandraError);
+        // No fallar la actualización si Cassandra falla
       }
     }
 
