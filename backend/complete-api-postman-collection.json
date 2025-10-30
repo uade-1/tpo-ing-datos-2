@@ -1,0 +1,384 @@
+{
+  "info": {
+    "name": "EduScale API - Complete Collection",
+    "description": "Complete API collection for EduScale scholarship management system with MongoDB, Redis, Neo4j, and Cassandra",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Instituciones CRUD",
+      "item": [
+        {
+          "name": "Create Institución",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Universidad de Buenos Aires\",\n  \"slug\": \"universidad-buenos-aires\",\n  \"descripcion\": \"Universidad pública de Argentina\",\n  \"direccion\": {\n    \"calle\": \"Av. Córdoba 2122\",\n    \"ciudad\": \"Buenos Aires\",\n    \"provincia\": \"CABA\",\n    \"codigo_postal\": \"1120\",\n    \"pais\": \"Argentina\"\n  },\n  \"contacto\": {\n    \"telefono\": \"+54 11 5285-0000\",\n    \"email\": \"info@uba.ar\",\n    \"sitio_web\": \"https://www.uba.ar\"\n  },\n  \"carreras\": [\n    {\n      \"nombre\": \"Ingeniería en Sistemas\",\n      \"departamento\": \"Facultad de Ingeniería\",\n      \"duracion_anos\": 5,\n      \"modalidad\": \"Presencial\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/instituciones",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "instituciones"]
+            }
+          }
+        },
+        {
+          "name": "Get All Instituciones",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/instituciones",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "instituciones"]
+            }
+          }
+        },
+        {
+          "name": "Get Institución by Slug",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/instituciones/universidad-buenos-aires",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "instituciones", "universidad-buenos-aires"]
+            }
+          }
+        },
+        {
+          "name": "Update Institución",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Universidad de Buenos Aires - UBA\",\n  \"descripcion\": \"Universidad pública de Argentina - Actualizada\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/instituciones/universidad-buenos-aires",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "instituciones", "universidad-buenos-aires"]
+            }
+          }
+        },
+        {
+          "name": "Delete Institución",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/api/v1/instituciones/universidad-buenos-aires",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "instituciones", "universidad-buenos-aires"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Estudiantes CRUD",
+      "item": [
+        {
+          "name": "Create Estudiante",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_postulante\": \"EST001\",\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Pérez\",\n  \"sexo\": \"masculino\",\n  \"dni\": \"12345678\",\n  \"mail\": \"juan.perez@email.com\",\n  \"departamento_interes\": \"Facultad de Ingeniería\",\n  \"carrera_interes\": \"Ingeniería en Sistemas\",\n  \"fecha_interes\": \"2024-01-15T10:00:00Z\",\n  \"fecha_entrevista\": \"2024-02-15T14:00:00Z\",\n  \"estado\": \"PENDING\",\n  \"documentos\": {\n    \"dni_img\": \"dni_juan_perez.jpg\",\n    \"analitico_img\": \"analitico_juan_perez.pdf\"\n  },\n  \"comite\": {\n    \"comite_id\": \"COM001\",\n    \"fecha_revision\": \"2024-02-20T16:00:00Z\",\n    \"decision\": \"PENDIENTE\",\n    \"comentarios\": \"Revisión en proceso\"\n  },\n  \"fecha_inscripcion\": \"2024-01-10T09:00:00Z\",\n  \"institucion_slug\": \"universidad-buenos-aires\",\n  \"enrollment_status\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/estudiantes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "estudiantes"]
+            }
+          }
+        },
+        {
+          "name": "Get All Estudiantes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/estudiantes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "estudiantes"]
+            }
+          }
+        },
+        {
+          "name": "Get Estudiante by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/estudiantes/EST001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "estudiantes", "EST001"]
+            }
+          }
+        },
+        {
+          "name": "Update Estudiante",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"ACEPTADO\",\n  \"comite\": {\n    \"decision\": \"ACEPTADO\",\n    \"comentarios\": \"Estudiante aceptado para la beca\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/estudiantes/EST001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "estudiantes", "EST001"]
+            }
+          }
+        },
+        {
+          "name": "Delete Estudiante",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/api/v1/estudiantes/EST001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "estudiantes", "EST001"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollment System",
+      "item": [
+        {
+          "name": "Email Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"estudiante@email.com\",\n  \"carrera_interes\": \"Ingeniería en Sistemas\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/enrollment/subscribe",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "enrollment", "subscribe"]
+            }
+          }
+        },
+        {
+          "name": "Check DNI Availability",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/enrollment/check/12345678?carrera_interes=Ingeniería en Sistemas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "enrollment", "check", "12345678"],
+              "query": [
+                {
+                  "key": "carrera_interes",
+                  "value": "Ingeniería en Sistemas"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Full Enrollment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_postulante\": \"EST002\",\n  \"nombre\": \"María\",\n  \"apellido\": \"González\",\n  \"sexo\": \"femenino\",\n  \"dni\": \"87654321\",\n  \"mail\": \"maria.gonzalez@email.com\",\n  \"departamento_interes\": \"Facultad de Ingeniería\",\n  \"carrera_interes\": \"Ingeniería en Sistemas\",\n  \"fecha_interes\": \"2024-01-20T10:00:00Z\",\n  \"fecha_entrevista\": \"2024-02-25T14:00:00Z\",\n  \"estado\": \"PENDING\",\n  \"documentos\": {\n    \"dni_img\": \"dni_maria_gonzalez.jpg\",\n    \"analitico_img\": \"analitico_maria_gonzalez.pdf\"\n  },\n  \"comite\": {\n    \"comite_id\": \"COM002\",\n    \"fecha_revision\": \"2024-02-28T16:00:00Z\",\n    \"decision\": \"PENDIENTE\",\n    \"comentarios\": \"Revisión en proceso\"\n  },\n  \"fecha_inscripcion\": \"2024-01-15T09:00:00Z\",\n  \"institucion_slug\": \"universidad-buenos-aires\",\n  \"enrollment_status\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/enrollment/submit",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "enrollment", "submit"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Neo4j Analytics",
+      "item": [
+        {
+          "name": "Get Carreras by Estudiante DNI",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/estudiante/12345678/carreras",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "estudiante",
+                "12345678",
+                "carreras"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Estudiantes by Carrera",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/carrera/Ingeniería en Sistemas/estudiantes",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "carrera",
+                "Ingeniería en Sistemas",
+                "estudiantes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Estudiantes by Carrera (Filtered by Status)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/carrera/Ingeniería en Sistemas/estudiantes?estado=ACEPTADO",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "carrera",
+                "Ingeniería en Sistemas",
+                "estudiantes"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "ACEPTADO"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Estadísticas de Carrera",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/carrera/Ingeniería en Sistemas/estadisticas",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "carrera",
+                "Ingeniería en Sistemas",
+                "estadisticas"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Estudiantes Multi-Carrera",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/estudiantes/multi-carrera",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "analytics", "estudiantes", "multi-carrera"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cassandra Scholarships",
+      "item": [
+        {
+          "name": "Register Scholarship Manual",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/v1/scholarships/register/12345678",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "scholarships", "register", "12345678"]
+            }
+          }
+        },
+        {
+          "name": "Get Scholarship by DNI",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/scholarships/universidad-buenos-aires/2024/12345678",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v1",
+                "scholarships",
+                "universidad-buenos-aires",
+                "2024",
+                "12345678"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Scholarships by Institution and Year",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/scholarships/universidad-buenos-aires/2024",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v1",
+                "scholarships",
+                "universidad-buenos-aires",
+                "2024"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    }
+  ]
+}

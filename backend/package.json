@@ -1,0 +1,36 @@
+{
+  "name": "instituciones-crud-api",
+  "version": "1.0.0",
+  "description": "CRUD API for managing educational institutions",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "bun run dist/index.js",
+    "dev": "bun --watch src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "api",
+    "crud",
+    "institutions",
+    "mongodb",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cassandra-driver": "^4.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "ioredis": "^5.3.2",
+    "mongoose": "^8.0.3",
+    "neo4j-driver": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.5",
+    "@types/cors": "^2.8.17",
+    "typescript": "^5.3.3"
+  }
+}
