@@ -4,6 +4,7 @@ import {
   getEstudiantesPorCarrera,
   getEstadisticasCarrera,
   getEstudiantesMultiCarrera,
+  getGraphDataByInstitution,
 } from "../controllers/analytics";
 
 const router = Router();
@@ -19,5 +20,8 @@ router.get("/carrera/:nombre_carrera/estadisticas", getEstadisticasCarrera);
 
 // GET /api/v1/analytics/estudiantes/multi-carrera
 router.get("/estudiantes/multi-carrera", getEstudiantesMultiCarrera);
+
+// GET /api/v1/analytics/graph/institucion/:institucion_slug
+router.get("/graph/institucion/:institucion_slug", getGraphDataByInstitution);
 
 export default router;

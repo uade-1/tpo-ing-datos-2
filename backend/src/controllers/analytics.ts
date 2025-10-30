@@ -2,6 +2,23 @@ import { Request, Response, NextFunction } from "express";
 import { neo4jAnalyticsService } from "../services/neo4jAnalytics";
 import { ApiError } from "../middleware/errorHandler";
 
+export const getGraphDataByInstitution = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { institucion_slug } = req.params;
+    const graphData = await neo4jAnalyticsService.getGraphDataByInstitution(institucion_slug);
+    res.status(200).json({
+      success: true,
+      data: graphData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getCarrerasEstudiante = async (
   req: Request,
   res: Response,

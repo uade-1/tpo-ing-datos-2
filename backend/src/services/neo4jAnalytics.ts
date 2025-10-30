@@ -100,6 +100,113 @@ export class Neo4jAnalyticsService {
       await session.close();
     }
   }
+
+  // Obtener datos del grafo filtrados por institución para visualización
+  async getGraphDataByInstitution(institucionSlug: string) {
+    const session = this.driver.session();
+    try {
+      // Get institution and its carreras
+      const instResult = await session.run(
+        `MATCH (i:Institucion {slug: $institucionSlug})
+         OPTIONAL MATCH (i)-[:OFRECE]->(c:Carrera)
+         RETURN i, collect(c) as carreras`,
+        { institucionSlug }
+      );
+
+      if (instResult.records.length === 0) {
+        return { nodes: [], links: [] };
+      }
+
+      const instRecord = instResult.records[0];
+      const institution = instRecord.get("i");
+      const carreras = instRecord.get("carreras").filter((c: any) => c !== null);
+
+      const nodes: any[] = [];
+      const links: any[] = [];
+      const nodeMap = new Map<string, any>();
+
+      // Add institution node
+      const instNode = {
+        id: `inst_${institucionSlug}`,
+        label: institution.properties.nombre,
+        type: 'Institucion',
+        slug: institucionSlug,
+      };
+      nodes.push(instNode);
+      nodeMap.set(instNode.id, instNode);
+
+      // Get all estudiantes related to these carreras
+      const carreraNombres = carreras.map((c: any) => c.properties.nombre);
+      
+      if (carreraNombres.length > 0) {
+        // Get estudiantes and their relationships
+        const estudiantesResult = await session.run(
+          `MATCH (e:Estudiante)-[r]->(c:Carrera)
+           WHERE c.nombre IN $carreraNombres
+           RETURN DISTINCT e, c, r, type(r) as estado`,
+          { carreraNombres }
+        );
+
+        // Process carreras
+        carreras.forEach((carrera: any) => {
+          const carreraId = `carrera_${carrera.properties.nombre}`;
+          if (!nodeMap.has(carreraId)) {
+            const carreraNode = {
+              id: carreraId,
+              label: carrera.properties.nombre,
+              type: 'Carrera',
+              departamento: carrera.properties.departamento || '',
+            };
+            nodes.push(carreraNode);
+            nodeMap.set(carreraId, carreraNode);
+
+            // Add OFRECE link from institution to carrera
+            links.push({
+              source: `inst_${institucionSlug}`,
+              target: carreraId,
+              type: 'OFRECE',
+            });
+          }
+        });
+
+        // Process estudiantes and their relationships
+        estudiantesResult.records.forEach((record: any) => {
+          const estudiante = record.get("e");
+          const carrera = record.get("c");
+          const estado = record.get("estado");
+
+          const estudianteId = `estudiante_${estudiante.properties.dni}`;
+          const carreraId = `carrera_${carrera.properties.nombre}`;
+
+          // Add estudiante node if not already added
+          if (!nodeMap.has(estudianteId)) {
+            const estudianteNode = {
+              id: estudianteId,
+              label: `${estudiante.properties.nombre} ${estudiante.properties.apellido}`,
+              type: 'Estudiante',
+              dni: estudiante.properties.dni,
+            };
+            nodes.push(estudianteNode);
+            nodeMap.set(estudianteId, estudianteNode);
+          }
+
+          // Add relationship link
+          links.push({
+            source: estudianteId,
+            target: carreraId,
+            type: estado,
+          });
+        });
+      }
+
+      return { nodes, links };
+    } catch (error) {
+      console.error("Error getting graph data:", error);
+      throw error;
+    } finally {
+      await session.close();
+    }
+  }
 }
 
 export const neo4jAnalyticsService = new Neo4jAnalyticsService();
