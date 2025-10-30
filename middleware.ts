@@ -17,6 +17,26 @@ function extractSlug(host: string | null): string | null {
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host");
   const slug = extractSlug(host) || "uade"; // default for dev
+  const pathname = req.nextUrl.pathname;
+
+  // Protect dashboard route - check for authentication cookie
+  if (pathname.startsWith("/dashboard")) {
+    const authCookieName = `institution-auth-${slug}`;
+    const authCookie = req.cookies.get(authCookieName);
+    
+    if (!authCookie || !authCookie.value) {
+      // Redirect to login if not authenticated
+      const loginUrl = new URL("/login", req.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // Allow login page to be accessed without auth
+  if (pathname.startsWith("/login")) {
+    const res = NextResponse.next();
+    res.cookies.set("tenant-slug", slug, { path: "/" });
+    return res;
+  }
 
   const res = NextResponse.next();
   // Persist tenant slug for SSR fetches
