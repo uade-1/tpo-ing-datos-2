@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,13 +50,18 @@ interface CassandraDataProps {
   refreshKey?: number;
 }
 
-export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProps) {
+export function CassandraData({
+  institucionSlug,
+  refreshKey,
+}: CassandraDataProps) {
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
   const [allScholarships, setAllScholarships] = useState<Scholarship[]>([]); // Store all data for filtering
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
+  );
+
   // Filters
   const [filterEstado, setFilterEstado] = useState<string>("ALL");
   const [filterDate, setFilterDate] = useState<string>(""); // Date filter for fecha_aceptacion
@@ -60,38 +71,52 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
       setIsLoading(true);
       setError(null);
       const res = await fetch(
-        `/api/v1/scholarships/${encodeURIComponent(institucionSlug)}/${selectedYear}`
+        `/api/v1/scholarships/${encodeURIComponent(
+          institucionSlug
+        )}/${selectedYear}`
       );
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error?.message || "Failed to fetch Cassandra data");
+        throw new Error(
+          json.error?.message || "Error al obtener datos de Cassandra"
+        );
       }
 
       // Convert Cassandra rows to our format
-      const scholarshipsData = (json.data?.scholarships || []).map((row: any) => ({
-        dni: row.dni || "",
-        id_postulante: row.id_postulante || "",
-        nombre: row.nombre || "",
-        apellido: row.apellido || "",
-        sexo: row.sexo || "",
-        mail: row.mail || "",
-        carrera_interes: row.carrera_interes || "",
-        departamento_interes: row.departamento_interes || "",
-        fecha_inscripcion: row.fecha_inscripcion ? new Date(row.fecha_inscripcion).toISOString() : "",
-        fecha_interes: row.fecha_interes ? new Date(row.fecha_interes).toISOString() : "",
-        fecha_entrevista: row.fecha_entrevista ? new Date(row.fecha_entrevista).toISOString() : undefined,
-        fecha_aceptacion: row.fecha_aceptacion ? new Date(row.fecha_aceptacion).toISOString() : "",
-        comite_decision: row.comite_decision || undefined,
-        comite_comentarios: row.comite_comentarios || undefined,
-      }));
+      const scholarshipsData = (json.data?.scholarships || []).map(
+        (row: any) => ({
+          dni: row.dni || "",
+          id_postulante: row.id_postulante || "",
+          nombre: row.nombre || "",
+          apellido: row.apellido || "",
+          sexo: row.sexo || "",
+          mail: row.mail || "",
+          carrera_interes: row.carrera_interes || "",
+          departamento_interes: row.departamento_interes || "",
+          fecha_inscripcion: row.fecha_inscripcion
+            ? new Date(row.fecha_inscripcion).toISOString()
+            : "",
+          fecha_interes: row.fecha_interes
+            ? new Date(row.fecha_interes).toISOString()
+            : "",
+          fecha_entrevista: row.fecha_entrevista
+            ? new Date(row.fecha_entrevista).toISOString()
+            : undefined,
+          fecha_aceptacion: row.fecha_aceptacion
+            ? new Date(row.fecha_aceptacion).toISOString()
+            : "",
+          comite_decision: row.comite_decision || undefined,
+          comite_comentarios: row.comite_comentarios || undefined,
+        })
+      );
 
       setAllScholarships(scholarshipsData);
       // Apply filters
       applyFilters(scholarshipsData, filterEstado, filterDate);
     } catch (err) {
       console.error("Error fetching Cassandra data:", err);
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : "Ocurrió un error");
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +156,7 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      return new Date(dateString).toLocaleDateString("es-AR", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -149,13 +174,17 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Cassandra Data</CardTitle>
-          <CardDescription>Students stored in Cassandra (ACEPTADO/RECHAZADO)</CardDescription>
+          <CardTitle>Histórico de Becas</CardTitle>
+          <CardDescription>
+            Estudiantes almacenados (ACEPTADO/RECHAZADO)
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-            <span className="ml-2 text-sm text-gray-600">Loading Cassandra data...</span>
+            <span className="ml-2 text-sm text-gray-600">
+              Cargando datos de Cassandra...
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -166,8 +195,10 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Cassandra Data</CardTitle>
-          <CardDescription>Students stored in Cassandra (ACEPTADO/RECHAZADO)</CardDescription>
+          <CardTitle>Histórico de Becas</CardTitle>
+          <CardDescription>
+            Estudiantes almacenados (ACEPTADO/RECHAZADO)
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="py-8 text-center text-sm text-red-600">
@@ -183,10 +214,7 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Cassandra Data</CardTitle>
-            <CardDescription>
-              Students stored in Cassandra (ACEPTADO/RECHAZADO) - Only final decisions are stored
-            </CardDescription>
+            <CardTitle>Admisiones</CardTitle>
           </div>
           <select
             value={selectedYear}
@@ -206,25 +234,31 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
         <div className="mb-4 flex flex-wrap gap-4 items-end pb-4 border-b">
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Filters:</span>
+            <span className="text-sm font-medium text-gray-700">Filtros:</span>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <Label htmlFor="cassandra-filter-estado" className="text-xs text-gray-600 mb-1 block">
+            <Label
+              htmlFor="cassandra-filter-estado"
+              className="text-xs text-gray-600 mb-1 block"
+            >
               Estado
             </Label>
             <Select value={filterEstado} onValueChange={setFilterEstado}>
               <SelectTrigger id="cassandra-filter-estado" className="w-full">
-                <SelectValue placeholder="Select estado" />
+                <SelectValue placeholder="Seleccione estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Estados</SelectItem>
+                <SelectItem value="ALL">Todos los Estados</SelectItem>
                 <SelectItem value="ACEPTADO">ACEPTADO</SelectItem>
                 <SelectItem value="RECHAZADO">RECHAZADO</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <Label htmlFor="cassandra-filter-date" className="text-xs text-gray-600 mb-1 block">
+            <Label
+              htmlFor="cassandra-filter-date"
+              className="text-xs text-gray-600 mb-1 block"
+            >
               Fecha de Resolución
             </Label>
             <Input
@@ -242,7 +276,7 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
               onClick={() => setFilterDate("")}
               className="h-9"
             >
-              Clear Date
+              Limpiar Fecha
             </Button>
           )}
         </div>
@@ -250,26 +284,28 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
         {scholarships.length === 0 ? (
           <div className="py-8 text-center text-sm text-gray-500">
             {allScholarships.length === 0
-              ? `No Cassandra data found for ${selectedYear}. Students are only stored in Cassandra when they reach ACEPTADO or RECHAZADO status.`
-              : "No students match the selected filters."}
+              ? `No se encontraron datos de Cassandra para ${selectedYear}. Los estudiantes solo se almacenan en Cassandra cuando alcanzan el estado ACEPTADO o RECHAZADO.`
+              : "No hay estudiantes que coincidan con los filtros seleccionados."}
           </div>
         ) : (
           <div className="space-y-4">
             <div className="text-sm text-gray-600 mb-4">
-              Found {scholarships.length} student{scholarships.length !== 1 ? "s" : ""} in Cassandra for {selectedYear}
-              {allScholarships.length !== scholarships.length && ` (filtered from ${allScholarships.length} total)`}
+              Se encontraron {scholarships.length} estudiante
+              {scholarships.length !== 1 ? "s" : ""} para {selectedYear}
+              {allScholarships.length !== scholarships.length &&
+                ` (filtrados de ${allScholarships.length} total)`}
             </div>
             <div className="border rounded-lg overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Nombre</TableHead>
                     <TableHead>DNI</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Carrera</TableHead>
                     <TableHead>Fecha Resolución</TableHead>
-                    <TableHead>Decision</TableHead>
+                    <TableHead>Decisión</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -285,11 +321,17 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
                       <TableCell>{scholarship.mail}</TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{scholarship.carrera_interes}</div>
-                          <div className="text-xs text-gray-500">{scholarship.departamento_interes}</div>
+                          <div className="font-medium">
+                            {scholarship.carrera_interes}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {scholarship.departamento_interes}
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell>{formatDate(scholarship.fecha_aceptacion)}</TableCell>
+                      <TableCell>
+                        {formatDate(scholarship.fecha_aceptacion)}
+                      </TableCell>
                       <TableCell>
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -314,4 +356,3 @@ export function CassandraData({ institucionSlug, refreshKey }: CassandraDataProp
     </Card>
   );
 }
-

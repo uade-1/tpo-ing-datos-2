@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { useInstitution } from "@/components/institution-provider";
@@ -37,7 +43,10 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        setError(data.error?.message || "Invalid credentials. Please try again.");
+        setError(
+          data.error?.message ||
+            "Credenciales inválidas. Por favor, intenta nuevamente."
+        );
         setIsLoading(false);
         return;
       }
@@ -47,7 +56,7 @@ export default function LoginPage() {
       router.refresh();
     } catch (err) {
       console.error("Login error:", err);
-      setError("An error occurred. Please try again.");
+      setError("Ocurrió un error. Por favor, intenta nuevamente.");
       setIsLoading(false);
     }
   };
@@ -57,16 +66,16 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            {inst.nombre} Admin Login
+            {inst.nombre} Admin
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your credentials to access the dashboard
+            Ingresa tus credenciales para acceder al panel de control
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Institution</Label>
+              <Label htmlFor="username">Institución</Label>
               <Input
                 id="username"
                 type="text"
@@ -76,13 +85,13 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder="Ingresa tu contraseña"
                 required
                 autoFocus
               />
@@ -94,7 +103,7 @@ export default function LoginPage() {
               </Alert>
             )}
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </Button>
           </form>
         </CardContent>
@@ -102,4 +111,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

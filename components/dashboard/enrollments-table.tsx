@@ -9,7 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +26,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, ChevronDown, ChevronRight, CheckCircle, XCircle, Calendar, Filter } from "lucide-react";
+import {
+  Loader2,
+  ChevronDown,
+  ChevronRight,
+  CheckCircle,
+  XCircle,
+  Calendar,
+  Filter,
+} from "lucide-react";
 
 interface Estudiante {
   _id: string;
@@ -53,19 +67,24 @@ const estadoColors: Record<string, string> = {
 const getMinDate = () => {
   const date = new Date();
   date.setDate(date.getDate() + 1); // Tomorrow
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 };
 const MIN_DATE = getMinDate();
 
-export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: EnrollmentsTableProps) {
+export function EnrollmentsTable({
+  institucionSlug,
+  onStudentUpdated,
+}: EnrollmentsTableProps) {
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
   const [allEstudiantes, setAllEstudiantes] = useState<Estudiante[]>([]); // Store all data for filtering
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
-  const [fechaEntrevistaValues, setFechaEntrevistaValues] = useState<Record<string, string>>({});
-  
+  const [fechaEntrevistaValues, setFechaEntrevistaValues] = useState<
+    Record<string, string>
+  >({});
+
   // Filters
   const [filterEstado, setFilterEstado] = useState<string>("INTERES"); // Default to INTERES
   const [filterDate, setFilterDate] = useState<string>(""); // Date filter for fecha_interes
@@ -78,11 +97,15 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
       newExpanded.add(id);
       // Initialize fecha_entrevista value when expanding row
       const estudiante = estudiantes.find((e) => e._id === id);
-      if (estudiante && estudiante.fecha_entrevista && !fechaEntrevistaValues[estudiante.id_postulante]) {
+      if (
+        estudiante &&
+        estudiante.fecha_entrevista &&
+        !fechaEntrevistaValues[estudiante.id_postulante]
+      ) {
         const date = new Date(estudiante.fecha_entrevista);
         setFechaEntrevistaValues((prev) => ({
           ...prev,
-          [estudiante.id_postulante]: date.toISOString().split('T')[0],
+          [estudiante.id_postulante]: date.toISOString().split("T")[0],
         }));
       }
     }
@@ -92,7 +115,7 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      return new Date(dateString).toLocaleDateString("es-AR", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -139,34 +162,40 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error?.message || "Failed to fetch enrollments");
+        throw new Error(
+          json.error?.message || "Error al obtener inscripciones"
+        );
       }
 
       const estudiantesData = json.data || [];
       setAllEstudiantes(estudiantesData);
-      
+
       // Initialize fecha_entrevista values for date inputs
       const fechaValues: Record<string, string> = {};
       estudiantesData.forEach((est: Estudiante) => {
         if (est.fecha_entrevista) {
           // Convert ISO date to YYYY-MM-DD format for date input
           const date = new Date(est.fecha_entrevista);
-          fechaValues[est.id_postulante] = date.toISOString().split('T')[0];
+          fechaValues[est.id_postulante] = date.toISOString().split("T")[0];
         }
       });
       setFechaEntrevistaValues(fechaValues);
-      
+
       // Apply filters
       applyFilters(estudiantesData, filterEstado, filterDate);
     } catch (err) {
       console.error("Error fetching enrollments:", err);
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : "Ocurrió un error");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const updateEstudianteEstado = async (idPostulante: string, nuevoEstado: "ACEPTADO" | "RECHAZADO", comentarios: string) => {
+  const updateEstudianteEstado = async (
+    idPostulante: string,
+    nuevoEstado: "ACEPTADO" | "RECHAZADO",
+    comentarios: string
+  ) => {
     setUpdatingIds((prev) => new Set(prev).add(idPostulante));
     try {
       const fechaResolucionISO = new Date().toISOString();
@@ -188,22 +217,30 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error?.message || "Failed to update student status");
+        throw new Error(
+          json.error?.message || "Error al actualizar el estado del estudiante"
+        );
       }
 
       // Update both filtered and all estudiantes state
       const updateStudent = (est: Estudiante) =>
         est.id_postulante === idPostulante
-          ? { ...est, estado: nuevoEstado, fecha_resolucion: fechaResolucionISO }
+          ? {
+              ...est,
+              estado: nuevoEstado,
+              fecha_resolucion: fechaResolucionISO,
+            }
           : est;
 
       setAllEstudiantes((prev) => prev.map(updateStudent));
       setEstudiantes((prev) => prev.map(updateStudent));
-      
+
       // Close expanded row after update
       setExpandedRows((prev) => {
         const newSet = new Set(prev);
-        const estudiante = allEstudiantes.find((e) => e.id_postulante === idPostulante);
+        const estudiante = allEstudiantes.find(
+          (e) => e.id_postulante === idPostulante
+        );
         if (estudiante) {
           newSet.delete(estudiante._id);
         }
@@ -216,7 +253,11 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
       }
     } catch (err) {
       console.error("Error updating student status:", err);
-      alert(err instanceof Error ? err.message : "An error occurred while updating the student status");
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Ocurrió un error al actualizar el estado del estudiante"
+      );
     } finally {
       setUpdatingIds((prev) => {
         const newSet = new Set(prev);
@@ -227,16 +268,23 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
   };
 
   const handleAccept = (idPostulante: string) => {
-    updateEstudianteEstado(idPostulante, "ACEPTADO", "Estudiante aceptado para la beca");
+    updateEstudianteEstado(
+      idPostulante,
+      "ACEPTADO",
+      "Estudiante aceptado para la beca"
+    );
   };
 
   const handleReject = (idPostulante: string) => {
     updateEstudianteEstado(idPostulante, "RECHAZADO", "Estudiante rechazado");
   };
 
-  const handleSetFechaEntrevista = async (idPostulante: string, fechaValue: string) => {
+  const handleSetFechaEntrevista = async (
+    idPostulante: string,
+    fechaValue: string
+  ) => {
     if (!fechaValue) {
-      alert("Please select a date");
+      alert("Por favor selecciona una fecha");
       return;
     }
 
@@ -257,14 +305,20 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error?.message || "Failed to update interview date");
+        throw new Error(
+          json.error?.message || "Error al actualizar la fecha de entrevista"
+        );
       }
 
       // Reload the page to refresh all data
       window.location.reload();
     } catch (err) {
       console.error("Error updating fecha_entrevista:", err);
-      alert(err instanceof Error ? err.message : "An error occurred while updating the interview date");
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Ocurrió un error al actualizar la fecha de entrevista"
+      );
       setUpdatingIds((prev) => {
         const newSet = new Set(prev);
         newSet.delete(idPostulante);
@@ -281,13 +335,17 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Enrollments</CardTitle>
-          <CardDescription>View and manage student enrollments</CardDescription>
+          <CardTitle>Inscripciones</CardTitle>
+          <CardDescription>
+            Ver y gestionar inscripciones de estudiantes
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-            <span className="ml-2 text-sm text-gray-600">Loading enrollments...</span>
+            <span className="ml-2 text-sm text-gray-600">
+              Cargando inscripciones...
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -298,8 +356,10 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Enrollments</CardTitle>
-          <CardDescription>View and manage student enrollments</CardDescription>
+          <CardTitle>Inscripciones</CardTitle>
+          <CardDescription>
+            Ver y gestionar inscripciones de estudiantes
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="py-8 text-center text-sm text-red-600">
@@ -313,10 +373,12 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Enrollments</CardTitle>
+        <CardTitle>Inscripciones</CardTitle>
         <CardDescription>
-          {estudiantes.length} student{estudiantes.length !== 1 ? "s" : ""} enrolled
-          {allEstudiantes.length !== estudiantes.length && ` (filtered from ${allEstudiantes.length} total)`}
+          {estudiantes.length} estudiante{estudiantes.length !== 1 ? "s" : ""}{" "}
+          inscrito{estudiantes.length !== 1 ? "s" : ""}
+          {allEstudiantes.length !== estudiantes.length &&
+            ` (filtrados de ${allEstudiantes.length} total)`}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -324,18 +386,21 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
         <div className="mb-4 flex flex-wrap gap-4 items-end pb-4 border-b">
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Filters:</span>
+            <span className="text-sm font-medium text-gray-700">Filtros:</span>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <Label htmlFor="filter-estado" className="text-xs text-gray-600 mb-1 block">
+            <Label
+              htmlFor="filter-estado"
+              className="text-xs text-gray-600 mb-1 block"
+            >
               Estado
             </Label>
             <Select value={filterEstado} onValueChange={setFilterEstado}>
               <SelectTrigger id="filter-estado" className="w-full">
-                <SelectValue placeholder="Select estado" />
+                <SelectValue placeholder="Seleccione estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Estados</SelectItem>
+                <SelectItem value="ALL">Todos los Estados</SelectItem>
                 <SelectItem value="INTERES">INTERES</SelectItem>
                 <SelectItem value="ENTREVISTA">ENTREVISTA</SelectItem>
                 <SelectItem value="ACEPTADO">ACEPTADO</SelectItem>
@@ -344,7 +409,10 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
             </Select>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <Label htmlFor="filter-date" className="text-xs text-gray-600 mb-1 block">
+            <Label
+              htmlFor="filter-date"
+              className="text-xs text-gray-600 mb-1 block"
+            >
               Fecha de Interés
             </Label>
             <Input
@@ -362,7 +430,7 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
               onClick={() => setFilterDate("")}
               className="h-9"
             >
-              Clear Date
+              Limpiar Fecha
             </Button>
           )}
         </div>
@@ -370,8 +438,8 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
         {estudiantes.length === 0 ? (
           <div className="py-8 text-center text-sm text-gray-500">
             {allEstudiantes.length === 0
-              ? "No enrollments found."
-              : "No students match the selected filters."}
+              ? "No se encontraron inscripciones."
+              : "No hay estudiantes que coincidan con los filtros seleccionados."}
           </div>
         ) : (
           <div className="max-h-[600px] overflow-y-auto border rounded-md">
@@ -379,7 +447,7 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
               <TableHeader className="sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableHead className="w-12"></TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead>Nombre</TableHead>
                   <TableHead>Carrera</TableHead>
                   <TableHead>Estado</TableHead>
                 </TableRow>
@@ -411,7 +479,8 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
                         <TableCell>
                           <span
                             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              estadoColors[estudiante.estado] || "bg-gray-100 text-gray-800"
+                              estadoColors[estudiante.estado] ||
+                              "bg-gray-100 text-gray-800"
                             }`}
                           >
                             {estudiante.estado}
@@ -424,76 +493,139 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
                             <div className="px-4 py-4">
                               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-4">
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">ID Postulante</p>
-                                  <p className="text-gray-600">{estudiante.id_postulante}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    ID Postulante
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {estudiante.id_postulante}
+                                  </p>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">DNI</p>
-                                  <p className="text-gray-600">{estudiante.dni}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    DNI
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {estudiante.dni}
+                                  </p>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">Email</p>
-                                  <p className="text-gray-600">{estudiante.mail}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    Email
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {estudiante.mail}
+                                  </p>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">Nombre</p>
-                                  <p className="text-gray-600">{estudiante.nombre}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    Nombre
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {estudiante.nombre}
+                                  </p>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">Apellido</p>
-                                  <p className="text-gray-600">{estudiante.apellido}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    Apellido
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {estudiante.apellido}
+                                  </p>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">Departamento</p>
-                                  <p className="text-gray-600">{estudiante.departamento_interes}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    Departamento
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {estudiante.departamento_interes}
+                                  </p>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">Carrera</p>
-                                  <p className="text-gray-600">{estudiante.carrera_interes}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    Carrera
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {estudiante.carrera_interes}
+                                  </p>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">Fecha de Interés</p>
-                                  <p className="text-gray-600">{formatDate(estudiante.fecha_interes)}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    Fecha de Interés
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {formatDate(estudiante.fecha_interes)}
+                                  </p>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">Fecha de Resolución</p>
-                                  <p className="text-gray-600">{formatDate(estudiante.fecha_resolucion)}</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    Fecha de Resolución
+                                  </p>
+                                  <p className="text-gray-600">
+                                    {formatDate(estudiante.fecha_resolucion)}
+                                  </p>
                                 </div>
                                 <div className="md:col-span-3">
-                                  <p className="font-semibold text-gray-700 mb-2">Fecha de Entrevista</p>
+                                  <p className="font-semibold text-gray-700 mb-2">
+                                    Fecha de Entrevista
+                                  </p>
                                   <div className="flex items-center gap-2">
                                     <Input
                                       type="date"
-                                      value={fechaEntrevistaValues[estudiante.id_postulante] || ""}
+                                      value={
+                                        fechaEntrevistaValues[
+                                          estudiante.id_postulante
+                                        ] || ""
+                                      }
                                       onChange={(e) => {
                                         setFechaEntrevistaValues((prev) => ({
                                           ...prev,
-                                          [estudiante.id_postulante]: e.target.value,
+                                          [estudiante.id_postulante]:
+                                            e.target.value,
                                         }));
                                       }}
                                       className="max-w-xs"
-                                      disabled={updatingIds.has(estudiante.id_postulante)}
+                                      disabled={updatingIds.has(
+                                        estudiante.id_postulante
+                                      )}
                                       min={MIN_DATE}
                                     />
                                     <Button
                                       size="sm"
                                       onClick={() => {
-                                        const fechaValue = fechaEntrevistaValues[estudiante.id_postulante];
+                                        const fechaValue =
+                                          fechaEntrevistaValues[
+                                            estudiante.id_postulante
+                                          ];
                                         if (fechaValue) {
-                                          handleSetFechaEntrevista(estudiante.id_postulante, fechaValue);
+                                          handleSetFechaEntrevista(
+                                            estudiante.id_postulante,
+                                            fechaValue
+                                          );
                                         }
                                       }}
                                       disabled={
-                                        updatingIds.has(estudiante.id_postulante) ||
-                                        !fechaEntrevistaValues[estudiante.id_postulante] ||
-                                        fechaEntrevistaValues[estudiante.id_postulante] ===
+                                        updatingIds.has(
+                                          estudiante.id_postulante
+                                        ) ||
+                                        !fechaEntrevistaValues[
+                                          estudiante.id_postulante
+                                        ] ||
+                                        fechaEntrevistaValues[
+                                          estudiante.id_postulante
+                                        ] ===
                                           (estudiante.fecha_entrevista
-                                            ? new Date(estudiante.fecha_entrevista).toISOString().split('T')[0]
+                                            ? new Date(
+                                                estudiante.fecha_entrevista
+                                              )
+                                                .toISOString()
+                                                .split("T")[0]
                                             : "")
                                       }
                                       variant="outline"
                                     >
-                                      {updatingIds.has(estudiante.id_postulante) ? (
+                                      {updatingIds.has(
+                                        estudiante.id_postulante
+                                      ) ? (
                                         <>
                                           <Loader2 className="h-3 w-3 mr-1 animate-spin" />
                                           Guardando...
@@ -508,65 +640,80 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
                                   </div>
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-700 mb-1">Estado</p>
+                                  <p className="font-semibold text-gray-700 mb-1">
+                                    Estado
+                                  </p>
                                   <span
                                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                      estadoColors[estudiante.estado] || "bg-gray-100 text-gray-800"
+                                      estadoColors[estudiante.estado] ||
+                                      "bg-gray-100 text-gray-800"
                                     }`}
                                   >
                                     {estudiante.estado}
                                   </span>
                                 </div>
                               </div>
-                              {estudiante.estado !== "ACEPTADO" && estudiante.estado !== "RECHAZADO" && (
-                                <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleReject(estudiante.id_postulante)}
-                                    disabled={updatingIds.has(estudiante.id_postulante)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    {updatingIds.has(estudiante.id_postulante) ? (
-                                      <>
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Procesando...
-                                      </>
-                                    ) : (
-                                      <>
-                                        <XCircle className="h-4 w-4 mr-2" />
-                                        Rechazar
-                                      </>
-                                    )}
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleAccept(estudiante.id_postulante)}
-                                    disabled={
-                                      updatingIds.has(estudiante.id_postulante) ||
-                                      !estudiante.fecha_entrevista
-                                    }
-                                    className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title={
-                                      !estudiante.fecha_entrevista
-                                        ? "Debe establecer una fecha de entrevista antes de aceptar"
-                                        : ""
-                                    }
-                                  >
-                                    {updatingIds.has(estudiante.id_postulante) ? (
-                                      <>
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Procesando...
-                                      </>
-                                    ) : (
-                                      <>
-                                        <CheckCircle className="h-4 w-4 mr-2" />
-                                        Aceptar
-                                      </>
-                                    )}
-                                  </Button>
-                                </div>
-                              )}
+                              {estudiante.estado !== "ACEPTADO" &&
+                                estudiante.estado !== "RECHAZADO" && (
+                                  <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleReject(estudiante.id_postulante)
+                                      }
+                                      disabled={updatingIds.has(
+                                        estudiante.id_postulante
+                                      )}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      {updatingIds.has(
+                                        estudiante.id_postulante
+                                      ) ? (
+                                        <>
+                                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                          Procesando...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <XCircle className="h-4 w-4 mr-2" />
+                                          Rechazar
+                                        </>
+                                      )}
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() =>
+                                        handleAccept(estudiante.id_postulante)
+                                      }
+                                      disabled={
+                                        updatingIds.has(
+                                          estudiante.id_postulante
+                                        ) || !estudiante.fecha_entrevista
+                                      }
+                                      className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                      title={
+                                        !estudiante.fecha_entrevista
+                                          ? "Debe establecer una fecha de entrevista antes de aceptar"
+                                          : ""
+                                      }
+                                    >
+                                      {updatingIds.has(
+                                        estudiante.id_postulante
+                                      ) ? (
+                                        <>
+                                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                          Procesando...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <CheckCircle className="h-4 w-4 mr-2" />
+                                          Aceptar
+                                        </>
+                                      )}
+                                    </Button>
+                                  </div>
+                                )}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -582,4 +729,3 @@ export function EnrollmentsTable({ institucionSlug, onStudentUpdated }: Enrollme
     </Card>
   );
 }
-

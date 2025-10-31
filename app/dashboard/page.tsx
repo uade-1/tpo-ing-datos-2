@@ -40,8 +40,10 @@ export default async function DashboardPage() {
       </div>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h2 className="text-3xl font-bold mb-2">Welcome to {slug.toUpperCase()} Dashboard</h2>
-          <p className="text-gray-600">Manage your institution's enrollment and settings</p>
+          <h2 className="text-3xl font-bold mb-2">Bienvenido</h2>
+          <p className="text-gray-600">
+            Administra las inscripciones y configuraciones de tu institución
+          </p>
         </div>
         <div className="space-y-6">
           <DashboardClient slug={slug} />
@@ -50,4 +52,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
