@@ -44,13 +44,13 @@ import { useInstitution } from "@/components/institution-provider";
 const STEPS = [
   {
     id: 1,
-    title: "Personal Information",
-    description: "Basic details about you",
+    title: "Información Personal",
+    description: "Detalles básicos sobre ti",
   },
   {
     id: 2,
-    title: "Academic Information",
-    description: "Your educational background",
+    title: "Información Académica",
+    description: "Tu historial educativo",
   },
 ];
 
@@ -295,7 +295,7 @@ export function ApplicationForm() {
       // Show success message
       setSubmitSuccess(
         result?.data?.message ||
-          "Application submitted successfully! You will receive a confirmation email shortly."
+          "¡Solicitud enviada exitosamente! Recibirás un correo de confirmación en breve."
       );
       setSubmitError(null);
 
@@ -308,7 +308,7 @@ export function ApplicationForm() {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Failed to submit application. Please try again.";
+          : "Error al enviar la solicitud. Por favor, intenta nuevamente.";
       setSubmitError(errorMessage);
       setSubmitSuccess(null);
 
@@ -366,13 +366,13 @@ export function ApplicationForm() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <CardTitle className="text-green-800">Success</CardTitle>
+              <CardTitle className="text-green-800">Éxito</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <p className="text-green-700">{submitSuccess}</p>
             <p className="mt-2 text-sm text-green-600">
-              Redirecting to home page...
+              Redirigiendo a la página de inicio...
             </p>
           </CardContent>
         </Card>
@@ -390,7 +390,7 @@ export function ApplicationForm() {
           <CardContent>
             <p className="text-red-700">{submitError}</p>
             <p className="mt-2 text-sm text-red-600">
-              Redirecting to home page...
+              Redirigiendo a la página de inicio...
             </p>
           </CardContent>
         </Card>
@@ -575,7 +575,7 @@ export function ApplicationForm() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">
-                      First Name <span className="text-destructive">*</span>
+                      Nombre <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="firstName"
@@ -584,12 +584,12 @@ export function ApplicationForm() {
                       onChange={(e) =>
                         updateFormData("firstName", e.target.value)
                       }
-                      placeholder="John"
+                      placeholder="Juan"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">
-                      Last Name <span className="text-destructive">*</span>
+                      Apellido <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="lastName"
@@ -598,14 +598,14 @@ export function ApplicationForm() {
                       onChange={(e) =>
                         updateFormData("lastName", e.target.value)
                       }
-                      placeholder="Doe"
+                      placeholder="Pérez"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="gender">
-                    Gender <span className="text-destructive">*</span>
+                    Sexo <span className="text-destructive">*</span>
                   </Label>
                   <Select
                     value={formData.gender}
@@ -613,18 +613,18 @@ export function ApplicationForm() {
                     required
                   >
                     <SelectTrigger id="gender">
-                      <SelectValue placeholder="Select gender" />
+                      <SelectValue placeholder="Seleccione sexo" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="male">Masculino</SelectItem>
+                      <SelectItem value="female">Femenino</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email">
-                    Email Address <span className="text-destructive">*</span>
+                    Correo Electrónico <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="email"
@@ -632,7 +632,7 @@ export function ApplicationForm() {
                     required
                     value={formData.email}
                     onChange={(e) => updateFormData("email", e.target.value)}
-                    placeholder="john.doe@example.com"
+                    placeholder="juan.perez@ejemplo.com"
                   />
                 </div>
               </div>
@@ -651,7 +651,7 @@ export function ApplicationForm() {
             disabled={currentStep === 1 || isSubmitting}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
-            Previous
+            Anterior
           </Button>
 
           {currentStep < STEPS.length ? (
@@ -664,7 +664,7 @@ export function ApplicationForm() {
                 ? isCheckingDni
                   ? "Verificando..."
                   : "Aplicar"
-                : "Next"}
+                : "Siguiente"}
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
@@ -681,7 +681,7 @@ export function ApplicationForm() {
                     !formData.email))
               }
             >
-              {isSubmitting ? "Submitting..." : "Submit Application"}
+              {isSubmitting ? "Enviando..." : "Enviar Solicitud"}
             </Button>
           )}
         </div>

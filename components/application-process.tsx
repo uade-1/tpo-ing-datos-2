@@ -9,41 +9,41 @@ export function ApplicationProcess() {
   const steps = [
     {
       number: 1,
-      title: "Create Your Account",
-      description: "Register on our application portal and complete your profile with basic information.",
-      timeline: "Start anytime",
+      title: "Crea Tu Cuenta",
+      description: "Regístrate en nuestro portal de solicitudes y completa tu perfil con información básica.",
+      timeline: "Comienza en cualquier momento",
     },
     {
       number: 2,
-      title: "Submit Required Documents",
-      description: "Upload transcripts, test scores, letters of recommendation, and your personal statement.",
-      timeline: "2-3 weeks",
+      title: "Envía los Documentos Requeridos",
+      description: "Sube transcripciones, resultados de exámenes, cartas de recomendación y tu carta de presentación.",
+      timeline: "2-3 semanas",
     },
     {
       number: 3,
-      title: "Complete Application Form",
+      title: "Completa el Formulario de Solicitud",
       description:
-        "Fill out the comprehensive scholarship application with your academic and extracurricular achievements.",
-      timeline: "1-2 weeks",
+        "Completa la solicitud de beca integral con tus logros académicos y extracurriculares.",
+      timeline: "1-2 semanas",
     },
     {
       number: 4,
-      title: "Review and Submit",
+      title: "Revisa y Envía",
       description:
-        "Review all materials for accuracy and completeness, then submit your application before the deadline.",
-      timeline: "Before deadline",
+        "Revisa todos los materiales para verificar su precisión y completitud, luego envía tu solicitud antes de la fecha límite.",
+      timeline: "Antes de la fecha límite",
     },
     {
       number: 5,
-      title: "Interview Process",
-      description: "Selected candidates will be invited for an interview with our scholarship committee.",
-      timeline: "4-6 weeks after submission",
+      title: "Proceso de Entrevista",
+      description: "Los candidatos seleccionados serán invitados a una entrevista con nuestro comité de becas.",
+      timeline: "4-6 semanas después del envío",
     },
     {
       number: 6,
-      title: "Receive Decision",
-      description: "Scholarship decisions are communicated via email and your application portal.",
-      timeline: "8-10 weeks after submission",
+      title: "Recibe la Decisión",
+      description: "Las decisiones de becas se comunican por correo electrónico y en tu portal de solicitudes.",
+      timeline: "8-10 semanas después del envío",
     },
   ]
 
@@ -51,10 +51,10 @@ export function ApplicationProcess() {
     <section id="process" className="border-b border-border bg-background py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">Application Process</h2>
+          <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">Proceso de Solicitud</h2>
           <p className="mt-4 text-pretty text-lg text-muted-foreground leading-relaxed">
-            Follow these simple steps to apply for our scholarship program. We've designed the process to be
-            straightforward and accessible.
+            Sigue estos pasos simples para solicitar nuestro programa de becas. Hemos diseñado el proceso para que sea
+            directo y accesible.
           </p>
         </div>
 
@@ -88,20 +88,20 @@ export function ApplicationProcess() {
 
         {/* Important dates */}
         <div className="mt-16 rounded-lg border border-border bg-accent/5 p-8">
-          <h3 className="text-center text-2xl font-bold">Important Dates</h3>
+          <h3 className="text-center text-2xl font-bold">Fechas Importantes</h3>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {/* CUSTOMIZATION POINT: Update application deadlines */}
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent">Dec 1, 2025</div>
-              <div className="mt-2 text-sm font-medium">Early Application Deadline</div>
+              <div className="text-3xl font-bold text-accent">1 Dic, 2025</div>
+              <div className="mt-2 text-sm font-medium">Fecha Límite de Solicitud Temprana</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent">Feb 15, 2026</div>
-              <div className="mt-2 text-sm font-medium">Regular Application Deadline</div>
+              <div className="text-3xl font-bold text-accent">15 Feb, 2026</div>
+              <div className="mt-2 text-sm font-medium">Fecha Límite de Solicitud Regular</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent">Apr 1, 2026</div>
-              <div className="mt-2 text-sm font-medium">Decision Notification</div>
+              <div className="text-3xl font-bold text-accent">1 Abr, 2026</div>
+              <div className="mt-2 text-sm font-medium">Notificación de Decisión</div>
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@ export function ApplicationProcess() {
         <div className="mt-12 text-center">
           <Link href="/apply">
             <Button size="lg" className="font-medium">
-              Start Your Application
+              Comienza Tu Solicitud
             </Button>
           </Link>
         </div>

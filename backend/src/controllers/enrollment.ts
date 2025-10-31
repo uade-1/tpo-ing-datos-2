@@ -235,7 +235,7 @@ export const submitEnrollment = async (
     res.status(201).json({
       success: true,
       data: {
-        message: `Enrollment submitted successfully for ${carrera_interes}`,
+        message: `Inscripción enviada exitosamente para ${carrera_interes}`,
         estudiante: savedEstudiante,
       },
     });

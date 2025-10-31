@@ -28,7 +28,7 @@ export function Footer() {
             </div>
             <p className="mt-4 text-sm text-primary-foreground/80 leading-relaxed">
               {inst.theme?.mensajes?.subtitulo_bienvenida ||
-                "Empowering students to achieve their academic dreams through comprehensive scholarship programs and unwavering support."}
+                "Empoderando estudiantes para alcanzar sus sueños académicos a través de programas integrales de becas y apoyo inquebrantable."}
             </p>
             {/* CUSTOMIZATION POINT: Update social media links */}
             <div className="mt-6 flex gap-4">
@@ -65,7 +65,7 @@ export function Footer() {
 
           {/* Quick links */}
           <div>
-            <h3 className="font-semibold">Quick Links</h3>
+            <h3 className="font-semibold">Enlaces Rápidos</h3>
             <ul className="mt-4 space-y-2 text-sm">
               {/* CUSTOMIZATION POINT: Update footer links */}
               <li>
@@ -73,7 +73,7 @@ export function Footer() {
                   href="#programs"
                   className="text-primary-foreground/80 transition-colors hover:text-primary-foreground"
                 >
-                  Scholarship Programs
+                  Programas de Becas
                 </a>
               </li>
               <li>
@@ -81,7 +81,7 @@ export function Footer() {
                   href="#benefits"
                   className="text-primary-foreground/80 transition-colors hover:text-primary-foreground"
                 >
-                  Benefits & Support
+                  Beneficios y Apoyo
                 </a>
               </li>
               <li>
@@ -89,17 +89,17 @@ export function Footer() {
                   href="#process"
                   className="text-primary-foreground/80 transition-colors hover:text-primary-foreground"
                 >
-                  Application Process
+                  Proceso de Solicitud
                 </a>
               </li>
               <li>
                 <a href="#faq" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
-                  FAQ
+                  Preguntas Frecuentes
                 </a>
               </li>
               <li>
                 <a href="#" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
-                  Student Portal
+                  Portal Estudiantil
                 </a>
               </li>
             </ul>
@@ -107,7 +107,7 @@ export function Footer() {
 
           {/* Contact info */}
           <div>
-            <h3 className="font-semibold">Contact Us</h3>
+            <h3 className="font-semibold">Contáctanos</h3>
             <ul className="mt-4 space-y-3 text-sm">
               {/* CUSTOMIZATION POINT: Update contact information */}
               <li className="flex items-start gap-2">
@@ -141,19 +141,19 @@ export function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="font-semibold">Stay Updated</h3>
+            <h3 className="font-semibold">Mantente Informado</h3>
             <p className="mt-4 text-sm text-primary-foreground/80">
-              Subscribe to receive scholarship updates and application reminders.
+              Suscríbete para recibir actualizaciones de becas y recordatorios de solicitudes.
             </p>
             <form className="mt-4 flex flex-col gap-2">
               <Input
                 type="email"
-                placeholder="Your email"
+                placeholder="Tu correo electrónico"
                 className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/50"
                 aria-label="Email for newsletter"
               />
               <Button variant="secondary" size="sm" className="w-full">
-                Subscribe
+                Suscribirse
               </Button>
             </form>
           </div>
@@ -162,17 +162,17 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 border-t border-primary-foreground/20 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 text-sm text-primary-foreground/80 md:flex-row">
-            <p>{inst.theme?.mensajes?.texto_footer || "© 2025 Institution Name. All rights reserved."}</p>
+            <p>{inst.theme?.mensajes?.texto_footer || "© 2025 Nombre de la Institución. Todos los derechos reservados."}</p>
             <div className="flex gap-6">
               {/* CUSTOMIZATION POINT: Update legal links */}
               <a href="#" className="transition-colors hover:text-primary-foreground">
-                Privacy Policy
+                Política de Privacidad
               </a>
               <a href="#" className="transition-colors hover:text-primary-foreground">
-                Terms of Service
+                Términos de Servicio
               </a>
               <a href="#" className="transition-colors hover:text-primary-foreground">
-                Accessibility
+                Accesibilidad
               </a>
             </div>
           </div>

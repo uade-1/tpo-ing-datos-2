@@ -9,26 +9,26 @@ export function KeyBenefits() {
     {
       icon: Award,
       stat: "$50M+",
-      label: "Awarded Annually",
-      description: "We invest significantly in student success through comprehensive scholarship funding.",
+      label: "Otorgado Anualmente",
+      description: "Invertimos significativamente en el éxito estudiantil a través de financiamiento integral de becas.",
     },
     {
       icon: TrendingUp,
       stat: "95%",
-      label: "Graduate Success Rate",
-      description: "Our scholarship recipients achieve exceptional outcomes and career advancement.",
+      label: "Tasa de Éxito de Graduados",
+      description: "Nuestros beneficiarios de becas logran resultados excepcionales y avance profesional.",
     },
     {
       icon: Network,
       stat: "10,000+",
-      label: "Alumni Network",
-      description: "Join a global community of successful graduates and industry leaders.",
+      label: "Red de Egresados",
+      description: "Únete a una comunidad global de graduados exitosos y líderes de la industria.",
     },
     {
       icon: Heart,
       stat: "100%",
-      label: "Student Support",
-      description: "Comprehensive mentorship, counseling, and academic support services.",
+      label: "Apoyo Estudiantil",
+      description: "Servicios integrales de tutoría, orientación y apoyo académico.",
     },
   ]
 
@@ -36,10 +36,10 @@ export function KeyBenefits() {
     <section id="benefits" className="border-b border-border bg-muted/30 py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">Why Choose Our Institution</h2>
+          <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">¿Por Qué Elegir Nuestra Institución?</h2>
           <p className="mt-4 text-pretty text-lg text-muted-foreground leading-relaxed">
-            We're committed to providing exceptional educational opportunities and comprehensive support for all our
-            scholarship recipients.
+            Estamos comprometidos a brindar oportunidades educativas excepcionales y apoyo integral para todos nuestros
+            beneficiarios de becas.
           </p>
         </div>
 
@@ -64,21 +64,21 @@ export function KeyBenefits() {
         <div className="mt-16 grid gap-6 md:grid-cols-3">
           {/* CUSTOMIZATION POINT: Update additional benefits */}
           <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="font-semibold">World-Class Faculty</h3>
+            <h3 className="font-semibold">Cuerpo Docente de Clase Mundial</h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              Learn from renowned professors and industry experts committed to your success.
+              Aprende de profesores reconocidos y expertos de la industria comprometidos con tu éxito.
             </p>
           </div>
           <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="font-semibold">Modern Facilities</h3>
+            <h3 className="font-semibold">Instalaciones Modernas</h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              Access state-of-the-art laboratories, libraries, and learning spaces.
+              Accede a laboratorios, bibliotecas y espacios de aprendizaje de vanguardia.
             </p>
           </div>
           <div className="rounded-lg border border-border bg-card p-6">
-            <h3 className="font-semibold">Career Services</h3>
+            <h3 className="font-semibold">Servicios de Carrera</h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              Benefit from dedicated career counseling and job placement assistance.
+              Benefíciate de asesoramiento profesional dedicado y asistencia para la colocación laboral.
             </p>
           </div>
         </div>

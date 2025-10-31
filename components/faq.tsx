@@ -8,44 +8,44 @@ import { Button } from "@/components/ui/button"
 export function FAQ() {
   const faqs = [
     {
-      question: "Who is eligible to apply for scholarships?",
+      question: "¿Quién es elegible para solicitar becas?",
       answer:
-        "Our scholarships are open to both domestic and international students who meet our academic requirements. Generally, applicants should have a minimum GPA of 3.0 (or equivalent), demonstrate academic excellence, and show commitment to their field of study. Specific eligibility criteria may vary by scholarship type.",
+        "Nuestras becas están abiertas tanto para estudiantes nacionales como internacionales que cumplan con nuestros requisitos académicos. Generalmente, los solicitantes deben tener un promedio mínimo de 3.0 (o equivalente), demostrar excelencia académica y mostrar compromiso con su campo de estudio. Los criterios de elegibilidad específicos pueden variar según el tipo de beca.",
     },
     {
-      question: "When is the application deadline?",
+      question: "¿Cuándo es la fecha límite de solicitud?",
       answer:
-        "We have two application deadlines: Early Application (December 1) and Regular Application (February 15). We encourage early application as some scholarships are awarded on a rolling basis. Late applications may be considered on a case-by-case basis depending on available funding.",
+        "Tenemos dos fechas límite de solicitud: Solicitud Temprana (1 de diciembre) y Solicitud Regular (15 de febrero). Fomentamos la solicitud temprana ya que algunas becas se otorgan de forma continua. Las solicitudes tardías pueden ser consideradas caso por caso según el financiamiento disponible.",
     },
     {
-      question: "Can I apply for multiple scholarships?",
+      question: "¿Puedo solicitar múltiples becas?",
       answer:
-        "Yes! You can apply for multiple scholarship programs with a single application. Our system will automatically consider you for all scholarships for which you meet the eligibility criteria. You only need to submit one comprehensive application.",
+        "¡Sí! Puedes solicitar múltiples programas de becas con una sola solicitud. Nuestro sistema te considerará automáticamente para todas las becas para las que cumplas los criterios de elegibilidad. Solo necesitas enviar una solicitud integral.",
     },
     {
-      question: "What documents do I need to submit?",
+      question: "¿Qué documentos necesito enviar?",
       answer:
-        "Required documents include: official transcripts, standardized test scores (if applicable), two letters of recommendation, a personal statement (500-1000 words), and proof of enrollment or acceptance. International students may need to provide additional documentation such as English proficiency test scores.",
+        "Los documentos requeridos incluyen: transcripciones oficiales, resultados de exámenes estandarizados (si aplica), dos cartas de recomendación, una carta de presentación (500-1000 palabras) y comprobante de inscripción o aceptación. Los estudiantes internacionales pueden necesitar proporcionar documentación adicional como resultados de exámenes de competencia en inglés.",
     },
     {
-      question: "How much funding can I receive?",
+      question: "¿Cuánto financiamiento puedo recibir?",
       answer:
-        "Scholarship amounts vary based on the program and individual circumstances. Awards range from partial tuition coverage to full-ride scholarships that include tuition, fees, room, board, and a stipend for books and supplies. The average scholarship award is $15,000 per academic year.",
+        "Los montos de las becas varían según el programa y las circunstancias individuales. Los premios van desde cobertura parcial de matrícula hasta becas completas que incluyen matrícula, tarifas, alojamiento, comida y un estipendio para libros y suministros. El premio promedio de beca es de $15,000 por año académico.",
     },
     {
-      question: "Is the scholarship renewable?",
+      question: "¿La beca es renovable?",
       answer:
-        "Most of our scholarships are renewable for up to four years (or the duration of your program) provided you maintain satisfactory academic progress, typically a minimum GPA of 3.0, and continue to meet the scholarship requirements. Renewal is reviewed annually.",
+        "La mayoría de nuestras becas son renovables por hasta cuatro años (o la duración de tu programa) siempre que mantengas un progreso académico satisfactorio, típicamente un promedio mínimo de 3.0, y continúes cumpliendo con los requisitos de la beca. La renovación se revisa anualmente.",
     },
     {
-      question: "When will I hear about my application status?",
+      question: "¿Cuándo sabré sobre el estado de mi solicitud?",
       answer:
-        "Application decisions are typically communicated 8-10 weeks after the deadline. Early applicants may hear back sooner. All applicants will receive notification via email and through their application portal, regardless of the decision.",
+        "Las decisiones de las solicitudes generalmente se comunican 8-10 semanas después de la fecha límite. Los solicitantes tempranos pueden recibir respuesta antes. Todos los solicitantes recibirán una notificación por correo electrónico y a través de su portal de solicitudes, independientemente de la decisión.",
     },
     {
-      question: "Can I defer my scholarship to a later term?",
+      question: "¿Puedo diferir mi beca a un período posterior?",
       answer:
-        "Deferral requests are considered on a case-by-case basis and must be submitted in writing with a valid reason. Generally, scholarships can be deferred for up to one academic year. Please contact our scholarship office to discuss your specific situation.",
+        "Las solicitudes de diferimiento se consideran caso por caso y deben enviarse por escrito con una razón válida. Generalmente, las becas pueden diferirse hasta un año académico. Por favor contacta a nuestra oficina de becas para discutir tu situación específica.",
     },
   ]
 
@@ -54,9 +54,9 @@ export function FAQ() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-3xl">
           <div className="text-center">
-            <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">Frequently Asked Questions</h2>
+            <h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">Preguntas Frecuentes</h2>
             <p className="mt-4 text-pretty text-lg text-muted-foreground leading-relaxed">
-              Find answers to common questions about our scholarship programs and application process.
+              Encuentra respuestas a preguntas comunes sobre nuestros programas de becas y proceso de solicitud.
             </p>
           </div>
 
@@ -73,12 +73,12 @@ export function FAQ() {
           </Accordion>
 
           <div className="mt-12 rounded-lg border border-border bg-muted/50 p-8 text-center">
-            <h3 className="text-xl font-semibold">Still have questions?</h3>
+            <h3 className="text-xl font-semibold">¿Aún tienes preguntas?</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Our scholarship team is here to help you through the application process.
+              Nuestro equipo de becas está aquí para ayudarte durante el proceso de solicitud.
             </p>
             <Button variant="outline" className="mt-4 bg-transparent">
-              Contact Support
+              Contactar Soporte
             </Button>
           </div>
         </div>
