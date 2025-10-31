@@ -138,7 +138,7 @@ export const updateEstudiante = async (
         updateData.comite.comite_id = `COM${Date.now()}`;
       }
       if (!updateData.comite.fecha_revision) {
-        updateData.comite.fecha_revision = new Date().toISOString();
+        updateData.comite.fecha_revision = new Date();
       }
     }
 

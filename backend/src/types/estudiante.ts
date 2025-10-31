@@ -63,5 +63,4 @@ export interface UpdateEstudianteRequest {
   comite?: Partial<EstudianteComite>;
   fecha_resolucion?: Date;
   institucion_slug?: string;
-  enrollment_status?: EnrollmentStatus;
 }
